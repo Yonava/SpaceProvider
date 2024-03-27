@@ -6,7 +6,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json('Hello World');
+  res.json({
+    message: 'Welcome to the space provider API! 🚀. Try /echo!'
+  });
 });
 
 app.get('/echo', (req, res) => {
