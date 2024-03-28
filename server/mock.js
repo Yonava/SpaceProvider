@@ -3,9 +3,9 @@
 const mock = {
   'LIB-350': {
     building: 'LIB',
-    roomCode: '350',
-    accessNotes: 'Please bring your own laptop',
-    images: 'something.png',
+    room: '350',
+    access_notes: 'this room is only accessible through the hidden du bois tunnel',
+    images: ['something.png', 'somethingelse.png', 'anotherthing.png'],
     gps_coords: {
       lat: 37.3352,
       long: -121.8811
