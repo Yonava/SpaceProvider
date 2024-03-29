@@ -8,7 +8,7 @@ const mock = {
     images: ['something.png', 'somethingelse.png', 'anotherthing.png'],
     gps_coords: {
       lat: 37.3352,
-      long: -121.8811
+      lon: -121.8811
     },
     labels: ['WHITE_BOARD', 'QUIET_AREA'],
     capacity: 50,
