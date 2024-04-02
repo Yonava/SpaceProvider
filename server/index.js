@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mockData = require('./mock');
+const adminAPI = require('./api/admin');
 
 // example of middleware you can use
 function myMiddleware(req, res, next) {
@@ -25,6 +26,8 @@ app.use(cors());
 
 // this lets us parse the request body as json (another example of useful middleware!)
 app.use(express.json());
+
+app.use('/admin', adminAPI);
 
 app.get('/', (req, res) => {
 
