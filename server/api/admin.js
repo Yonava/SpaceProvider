@@ -7,6 +7,12 @@ router.get('/', async (req, res) => {
   res.json(rooms);
 });
 
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  const room = await Room.findById(id);
+  res.json(room);
+});
+
 router.post('/', async (req, res) => {
   const { body } = req;
   const room = new Room(body);
@@ -21,6 +27,14 @@ router.put('/:id', async (req, res) => {
     new: true
   });
   res.json(room);
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  await Room.findByIdAndDelete(id);
+  res.json({
+    message: 'Room deleted'
+  });
 });
 
 module.exports = router;
