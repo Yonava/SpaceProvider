@@ -6,7 +6,11 @@ import type { Room, PostedRoom } from '../rooms'
 export const useRooms = defineStore('rooms', () => {
 
   const rooms = ref<PostedRoom[]>([])
-  const currentRoom = ref<Room | PostedRoom | null>(null)
+  const currentRoom = ref<PostedRoom | null>(null)
+
+  const setCurrentRoom = (room: PostedRoom) => {
+    currentRoom.value = room
+  }
 
   const filterQuery = ref('')
 
@@ -27,16 +31,17 @@ export const useRooms = defineStore('rooms', () => {
       try {
         const res = await updateRoom(room)
         rooms.value.unshift(res)
+        return res
       } catch (err) {
         // location.reload()
         console.error(err)
       }
-      return
     }
 
     try {
       const res = await postRoom(room)
       rooms.value.unshift(res)
+      return res
     } catch (err) {
       // location.reload()
       console.error(err)
@@ -50,6 +55,7 @@ export const useRooms = defineStore('rooms', () => {
     displayedRooms,
     rooms,
     currentRoom,
-    saveRoom
+    setCurrentRoom,
+    saveRoom,
   }
 })

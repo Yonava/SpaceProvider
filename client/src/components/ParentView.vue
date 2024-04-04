@@ -3,23 +3,32 @@ import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
 import { newRoom } from '../rooms';
 
-const createRoom = () => {
+const { saveRoom, setCurrentRoom } = useRooms();
+
+const createRoom = async () => {
   const room = newRoom('WOO');
-  useRooms().saveRoom(room);
+  const postedRoom = await saveRoom(room);
+  if (!postedRoom) {
+    console.warn('Failed to create room');
+    return;
+  }
+  setCurrentRoom(postedRoom);
 }
 </script>
 
 <template>
   <div class="pa-4">
-    <div>
+    <div class="d-flex justify-space-between align-center">
       <h1>
         Rooms
       </h1>
+      <!-- drop down menu of buildings -->
       <v-btn
         @click.stop="createRoom"
-        color="blue"
+        color="green"
+        icon
       >
-        Create Room
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
     <div>
