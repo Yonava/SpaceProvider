@@ -1,15 +1,15 @@
 import axios from 'axios'
 import type { Room, PostedRoom } from './rooms'
 
-const URI = '/'
+const URI = '/api'
 
 const getRooms = async () => {
-  const { data } = await axios.get<Room[]>(URI)
+  const { data } = await axios.get<PostedRoom[]>(URI)
   return data
 }
 
 const getRoom = async (mongoId: string) => {
-  const { data } = await axios.get<Room>(`${URI}${mongoId}`)
+  const { data } = await axios.get<PostedRoom>(`${URI}${mongoId}`)
   return data
 }
 

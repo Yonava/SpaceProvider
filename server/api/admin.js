@@ -3,14 +3,28 @@ const router = express.Router();
 const Room = require('../schemas/rooms');
 
 router.get('/', async (req, res) => {
-  const rooms = await Room.find();
-  res.json(rooms);
+  console.log('GET /rooms');
+  try {
+    const rooms = await Room.find();
+    res.json(rooms);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error getting rooms'
+    });
+  }
 });
 
 router.get('/:id', async (req, res) => {
+  console.log('GET /rooms/:id', req.params.id);
   const { id } = req.params;
-  const room = await Room.findById(id);
-  res.json(room);
+  try {
+    const room = await Room.findById(id);
+    res.json(room);
+  } catch (error) {
+    res.status(404).json({
+      message: 'Room not found'
+    });
+  }
 });
 
 router.post('/', async (req, res) => {

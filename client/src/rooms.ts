@@ -49,3 +49,14 @@ export type Room = {
 }
 
 export type PostedRoom<T extends Room = Room> = T & { _id: string }
+
+export const newRoom = (building: Building): Room => ({
+  building,
+  room: '',
+  access_notes: '',
+  images: [],
+  gps_coords: { lat: 0, lon: 0 },
+  labels: [],
+  capacity: 0,
+  last_edited: new Date(),
+})

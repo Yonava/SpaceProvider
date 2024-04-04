@@ -16,8 +16,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/admin/api': {
-        target: 'http://localhost:1010',
+      '/api': {
+        target: 'http://localhost:3000/admin',
         changeOrigin: true
       }
     }
