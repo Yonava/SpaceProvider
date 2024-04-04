@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
-import { getRooms, postRoom, updateRoom } from '../api'
+import { getRooms, postRoom, updateRoom, deleteRoom } from '../api'
 import type { Room, PostedRoom } from '../rooms'
 
 export const useRooms = defineStore('rooms', () => {
@@ -47,6 +47,16 @@ export const useRooms = defineStore('rooms', () => {
     }
   }
 
+  const removeRoom = async (_id: string) => {
+    try {
+      await deleteRoom(_id)
+      rooms.value = rooms.value.filter(room => room._id !== _id)
+      setCurrentRoom(null)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   onMounted(fetchRooms)
 
   return {
@@ -56,5 +66,6 @@ export const useRooms = defineStore('rooms', () => {
     currentRoom,
     setCurrentRoom,
     saveRoom,
+    removeRoom
   }
 })

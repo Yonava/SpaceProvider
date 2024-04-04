@@ -6,7 +6,7 @@ import { newRoom } from '../rooms';
 const { saveRoom, setCurrentRoom } = useRooms();
 
 const createRoom = async () => {
-  const room = newRoom('WOO');
+  const room = newRoom();
   const postedRoom = await saveRoom(room);
   if (!postedRoom) {
     console.warn('Failed to create room');
@@ -22,7 +22,6 @@ const createRoom = async () => {
       <h1>
         Rooms
       </h1>
-      <!-- drop down menu of buildings -->
       <v-btn
         @click.stop="createRoom"
         color="green"
@@ -31,7 +30,7 @@ const createRoom = async () => {
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
-    <div>
+    <div class="py-2">
       <RoomList />
     </div>
   </div>

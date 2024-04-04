@@ -2,7 +2,7 @@
 import { buildings, labels } from '../rooms';
 import type { PostedRoom } from '../rooms';
 
-const capacities = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const capacities = [10, 20, 30, 40, 50];
 
 const props = defineProps<{
   room: PostedRoom;

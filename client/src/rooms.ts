@@ -25,12 +25,13 @@ export const buildings = [
   'MRL2',
   'HERT',
   'BART',
-  'WIT'
+  'WIT',
+  ''
 ] as const
 
 export type RoomLabel = typeof labels[number]
 
-export type Building = typeof buildings[number] | ''
+export type Building = typeof buildings[number]
 
 export type GPSCoord = {
   lat: number,
@@ -50,8 +51,8 @@ export type Room = {
 
 export type PostedRoom<T extends Room = Room> = T & { _id: string }
 
-export const newRoom = (building: Building): Room => ({
-  building,
+export const newRoom = (): Room => ({
+  building: '',
   room: '',
   access_notes: '',
   images: [],
