@@ -7,6 +7,13 @@ const capacities = [10, 20, 30, 40, 50];
 const props = defineProps<{
   room: PostedRoom;
 }>();
+
+const getLiveGPS = () => {
+  navigator.geolocation.getCurrentPosition((position) => {
+    props.room.gps_coords.lat = position.coords.latitude;
+    props.room.gps_coords.lon = position.coords.longitude;
+  });
+};
 </script>
 
 <template>
@@ -51,6 +58,39 @@ const props = defineProps<{
         {{ capacity }}
       </v-btn>
     </div>
+
+    <v-textarea
+      v-model="props.room.access_notes"
+      class="mt-5"
+      label="Access Notes"
+    ></v-textarea>
+
+    <h3 class="my-3">
+      GPS Coordinates
+    </h3>
+
+    <div
+      class="d-flex"
+      style="gap: 20px"
+      :key="props.room.gps_coords.lat"
+    >
+      <v-text-field
+        v-model="props.room.gps_coords.lat"
+        label="Lat"
+      />
+
+      <v-text-field
+        v-model="props.room.gps_coords.lon"
+        label="Lon"
+      />
+    </div>
+
+    <v-btn
+      @click.stop="getLiveGPS"
+      color="primary"
+    >
+      Get Live GPS Coordinates
+    </v-btn>
 
   </div>
 

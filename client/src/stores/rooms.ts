@@ -27,6 +27,9 @@ export const useRooms = defineStore('rooms', () => {
   }
 
   const saveRoom = async (room: Room | PostedRoom) => {
+
+    room.last_edited = new Date()
+
     if ('_id' in room) {
       try {
         return await updateRoom(room)

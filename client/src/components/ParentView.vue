@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
-import { newRoom } from '../rooms';
+import { newRoom, type GPSCoord } from '../rooms';
 
 const { saveRoom, setCurrentRoom } = useRooms();
 
+const getCoords = () => new Promise<GPSCoord>((resolve) => {
+  navigator.geolocation.getCurrentPosition((position) => {
+    resolve({
+      lat: position.coords.latitude,
+      lon: position.coords.longitude,
+    });
+  });
+});
+
 const createRoom = async () => {
   const room = newRoom();
+  room.gps_coords = await getCoords();
   const postedRoom = await saveRoom(room);
   if (!postedRoom) {
     console.warn('Failed to create room');
