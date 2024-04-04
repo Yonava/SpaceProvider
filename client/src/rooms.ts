@@ -30,7 +30,7 @@ export const buildings = [
 
 export type RoomLabel = typeof labels[number]
 
-export type Building = typeof buildings[number]
+export type Building = typeof buildings[number] | ''
 
 export type GPSCoord = {
   lat: number,

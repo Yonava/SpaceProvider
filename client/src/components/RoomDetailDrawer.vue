@@ -41,7 +41,10 @@ const closeDrawer = () => {
     location="bottom"
     style="width: 100%; height: calc(100vh - 175px);"
   >
-    <div v-if="currentRoom">
+    <div
+      v-if="currentRoom"
+      class="pa-4"
+    >
       <RoomDetail :room="currentRoom" />
     </div>
     <div v-else>
