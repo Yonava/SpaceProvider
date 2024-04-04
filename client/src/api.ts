@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Room, PostedRoom } from './rooms'
 
-const URI = '/api'
+const URI = '/api/'
 
 const getRooms = async () => {
   const { data } = await axios.get<PostedRoom[]>(URI)
@@ -19,6 +19,7 @@ const postRoom = async <T extends Room>(room: T) => {
 }
 
 const updateRoom = async <T extends PostedRoom>(room: T) => {
+  console.log('calling update', `${URI}${room._id}`)
   const { data } = await axios.put<T>(`${URI}${room._id}`, room)
   return data
 }

@@ -8,7 +8,7 @@ export const useRooms = defineStore('rooms', () => {
   const rooms = ref<PostedRoom[]>([])
   const currentRoom = ref<PostedRoom | null>(null)
 
-  const setCurrentRoom = (room: PostedRoom) => {
+  const setCurrentRoom = (room: PostedRoom | null) => {
     currentRoom.value = room
   }
 
@@ -29,10 +29,9 @@ export const useRooms = defineStore('rooms', () => {
   const saveRoom = async (room: Room | PostedRoom) => {
     if ('_id' in room) {
       try {
-        const res = await updateRoom(room)
-        rooms.value.unshift(res)
-        return res
+        return await updateRoom(room)
       } catch (err) {
+        console.log('failed to update')
         // location.reload()
         console.error(err)
       }

@@ -30,19 +30,33 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   console.log('POST /rooms', req.body);
   const { body } = req;
-  const room = new Room(body);
-  await room.save();
-  res.json(room);
+  try {
+    const room = new Room(body);
+    await room.save();
+    res.json(room);
+  } catch {
+    console.log('Error creating room');
+    res.status(500).json({
+      message: 'Error creating room'
+    });
+  }
 });
 
 router.put('/:id', async (req, res) => {
   console.log('PUT /rooms/:id', req.params.id, req.body);
   const { id } = req.params;
   const { body } = req;
-  const room = await Room.findByIdAndUpdate(id, body, {
-    new: true
-  });
-  res.json(room);
+  try {
+    const room = await Room.findByIdAndUpdate(id, body, {
+      new: true
+    });
+    res.json(room);
+  } catch (error) {
+    console.log('Error updating room');
+    res.status(500).json({
+      message: 'Error updating room'
+    });
+  }
 });
 
 router.delete('/:id', async (req, res) => {
