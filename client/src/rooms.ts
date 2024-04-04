@@ -46,5 +46,6 @@ export type Room = {
   labels: RoomLabel[],
   capacity: number,
   last_edited: Date,
-  _id: string
 }
+
+export type PostedRoom<T extends Room = Room> = T & { _id: string }
