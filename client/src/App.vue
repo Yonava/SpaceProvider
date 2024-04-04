@@ -1,14 +1,9 @@
 <script setup lang="ts">
+import ParentView from './components/ParentView.vue'
 </script>
 
 <template>
   <v-app>
-    <div>
-      <v-text-field>
-        <template #prepend>
-          <v-icon>mdi-magnify</v-icon>
-        </template>
-      </v-text-field>
-    </div>
+    <ParentView />
   </v-app>
 </template>

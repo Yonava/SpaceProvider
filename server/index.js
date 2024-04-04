@@ -11,7 +11,7 @@ mongoose.connect(MONGO_URI);
 
 app.use(cors());
 app.use(express.json());
-app.use('/admin', adminAPI);
+app.use('/admin/api', adminAPI);
 
 app.get('/', (req, res) => {
   res.json({
