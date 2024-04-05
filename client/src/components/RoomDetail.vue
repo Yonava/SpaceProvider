@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { buildings, labels } from '../rooms';
 import type { PostedRoom } from '../rooms';
+import { getCoords } from '../location';
 
 const capacities = [10, 20, 30, 40, 50];
 
@@ -8,11 +9,8 @@ const props = defineProps<{
   room: PostedRoom;
 }>();
 
-const getLiveGPS = () => {
-  navigator.geolocation.getCurrentPosition((position) => {
-    props.room.gps_coords.lat = position.coords.latitude;
-    props.room.gps_coords.lon = position.coords.longitude;
-  });
+const getLiveGPS = async () => {
+  props.room.gps_coords = await getCoords();
 };
 </script>
 
@@ -72,7 +70,6 @@ const getLiveGPS = () => {
     <div
       class="d-flex"
       style="gap: 20px"
-      :key="props.room.gps_coords.lat"
     >
       <v-text-field
         v-model="props.room.gps_coords.lat"

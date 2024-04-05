@@ -1,21 +1,24 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
-import { newRoom, type GPSCoord } from '../rooms';
+import { newRoom } from '../rooms';
+import { getCoords, getDistanceInMeters } from '../location';
 
 const { saveRoom, setCurrentRoom } = useRooms();
 
-const getCoords = () => new Promise<GPSCoord>((resolve) => {
-  navigator.geolocation.getCurrentPosition((position) => {
-    resolve({
-      lat: position.coords.latitude,
-      lon: position.coords.longitude,
-    });
-  });
-});
+const addLoading = ref(false);
 
 const createRoom = async () => {
-  const room = newRoom();
+  const { rooms } = useRooms();
+  addLoading.value = true;
+  const currentCoords = await getCoords();
+  const sortedRooms = rooms.slice().sort((a, b) => {
+    const distA = getDistanceInMeters(currentCoords, a.gps_coords);
+    const distB = getDistanceInMeters(currentCoords, b.gps_coords);
+    return distA - distB;
+  });
+  const room = newRoom(sortedRooms[0]?.building ?? '');
   room.gps_coords = await getCoords();
   const postedRoom = await saveRoom(room);
   if (!postedRoom) {
@@ -23,6 +26,7 @@ const createRoom = async () => {
     return;
   }
   setCurrentRoom(postedRoom);
+  addLoading.value = false;
 }
 </script>
 
@@ -34,6 +38,7 @@ const createRoom = async () => {
       </h1>
       <v-btn
         @click.stop="createRoom"
+        :loading="addLoading"
         color="green"
         icon
       >

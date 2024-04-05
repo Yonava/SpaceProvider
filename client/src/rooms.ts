@@ -26,7 +26,6 @@ export const buildings = [
   'HERT',
   'BART',
   'WIT',
-  ''
 ] as const
 
 export type RoomLabel = typeof labels[number]
@@ -51,8 +50,8 @@ export type Room = {
 
 export type PostedRoom<T extends Room = Room> = T & { _id: string }
 
-export const newRoom = (): Room => ({
-  building: '',
+export const newRoom = (building: Building): Room => ({
+  building,
   room: '',
   access_notes: '',
   images: [],
