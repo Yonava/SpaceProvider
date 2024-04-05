@@ -19,7 +19,6 @@ const postRoom = async <T extends Room>(room: T) => {
 }
 
 const updateRoom = async <T extends PostedRoom>(room: T) => {
-  console.log('calling update', `${URI}${room._id}`)
   const { data } = await axios.put<T>(`${URI}${room._id}`, room)
   return data
 }
