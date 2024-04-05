@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Room, PostedRoom } from './rooms'
 
-const URI = '/api/'
+const URI = ''
 
 const getRooms = async () => {
   const { data } = await axios.get<PostedRoom[]>(URI)
