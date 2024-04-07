@@ -1,3 +1,5 @@
+// import type { File } from "vuetify/lib/components/index.mjs"
+
 export const labels = [
   'OUTLETS',
   'NO_OUTLETS',
@@ -41,7 +43,7 @@ export type Room = {
   building: Building,
   room: string,
   access_notes: string,
-  images: string[],
+  images: any[],
   gps_coords: GPSCoord,
   labels: RoomLabel[],
   capacity: number,

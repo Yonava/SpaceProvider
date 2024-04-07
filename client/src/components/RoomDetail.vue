@@ -3,7 +3,7 @@ import { buildings, labels } from '../rooms';
 import type { PostedRoom } from '../rooms';
 import { getCoords } from '../location';
 
-const capacities = [10, 20, 30, 40, 50];
+const capacities = [10, 20, 30, 40];
 
 const props = defineProps<{
   room: PostedRoom;
@@ -42,6 +42,8 @@ const getLiveGPS = async () => {
 
     <v-text-field
       v-model="props.room.capacity"
+      type="number"
+      inputmode="numeric"
       label="Capacity"
     />
 
@@ -56,6 +58,16 @@ const getLiveGPS = async () => {
         {{ capacity }}
       </v-btn>
     </div>
+
+    <v-file-input
+      v-model="props.room.images"
+      prepend-icon="mdi-camera"
+      label="Images"
+      multiple
+      accept="image/*"
+      class="mt-5"
+      hide-details
+    />
 
     <v-textarea
       v-model="props.room.access_notes"
