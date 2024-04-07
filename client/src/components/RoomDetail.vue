@@ -2,8 +2,9 @@
 import { buildings, labels } from '../rooms';
 import type { PostedRoom } from '../rooms';
 import { getCoords } from '../location';
+import ImageUpload from './ImageUpload.vue';
 
-const capacities = [10, 20, 30, 40];
+const capacities = Array.from({ length: 30 }, (_, i) => (i + 1) * 10);
 
 const props = defineProps<{
   room: PostedRoom;
@@ -15,7 +16,7 @@ const getLiveGPS = async () => {
 </script>
 
 <template>
-  <div>
+  <div style="padding-bottom: 300px">
     <h1 class="mb-3">
       Edit Room
     </h1>
@@ -45,11 +46,16 @@ const getLiveGPS = async () => {
       type="number"
       inputmode="numeric"
       label="Capacity"
+      hide-details
     />
 
-    <div class="d-flex flex-wrap justify-center" style="gap: 10px;">
+    <div
+      class="d-flex py-3"
+      style="gap: 10px; overflow-y: auto;"
+    >
       <v-btn
         v-for="capacity in capacities"
+        size="small"
         color="primary"
         rounded
         :key="capacity"
@@ -59,15 +65,11 @@ const getLiveGPS = async () => {
       </v-btn>
     </div>
 
-    <v-file-input
-      v-model="props.room.images"
-      prepend-icon="mdi-camera"
-      label="Images"
-      multiple
-      accept="image/*"
-      class="mt-5"
-      hide-details
-    />
+    <div class="mt-5">
+      <ImageUpload
+        v-model="props.room.images"
+      />
+    </div>
 
     <v-textarea
       v-model="props.room.access_notes"
@@ -96,6 +98,7 @@ const getLiveGPS = async () => {
 
     <v-btn
       @click.stop="getLiveGPS"
+      size="small"
       color="primary"
     >
       Get Live GPS Coordinates
