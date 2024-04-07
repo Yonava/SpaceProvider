@@ -1,11 +1,20 @@
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import RoomListItem from './RoomListItem.vue';
 import { useRooms } from '../stores/rooms';
 
 const { displayedRooms, loadingRooms } = storeToRefs(useRooms());
 const { setCurrentRoom, removeRoom } = useRooms();
+
+const roomBeingDeleted = ref('');
+
+const deleteRoom = async (_id: string) => {
+  roomBeingDeleted.value = _id;
+  await removeRoom(_id);
+  roomBeingDeleted.value = '';
+}
 </script>
 
 <template>
@@ -17,7 +26,8 @@ const { setCurrentRoom, removeRoom } = useRooms();
       class="my-2"
     >
       <RoomListItem
-        @delete="removeRoom"
+        @delete="deleteRoom"
+        :deleting="roomBeingDeleted === room._id"
         :room="room"
       />
     </div>

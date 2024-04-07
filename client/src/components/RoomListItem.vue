@@ -4,6 +4,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   room: PostedRoom;
+  deleting: boolean;
 }>();
 
 defineEmits<{
@@ -29,6 +30,7 @@ const roomCodeDisplay = computed(() => {
         </h3>
         <v-btn
           @click.stop="$emit('delete', props.room._id)"
+          :loading="props.deleting"
           color="red"
         >
           <v-icon>mdi-delete</v-icon>
