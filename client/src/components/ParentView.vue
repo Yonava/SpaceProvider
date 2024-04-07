@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
@@ -7,7 +7,17 @@ import { newRoom } from '../rooms';
 import { getCoords, getDistanceInMeters } from '../location';
 
 const { saveRoom, setCurrentRoom } = useRooms();
-const { filterQuery } = storeToRefs(useRooms());
+const { filterQuery, displayedRooms, loadingRooms } = storeToRefs(useRooms());
+
+const roomListLabel = computed(() => {
+  if (displayedRooms.value.length === 0 && filterQuery.value) {
+    return `no rooms match "${filterQuery.value}"`;
+  } else if (displayedRooms.value.length === 1) {
+    return 'showing 1 room';
+  } else {
+    return `showing ${displayedRooms.value.length} rooms`;
+  }
+});
 
 const addLoading = ref(false);
 
@@ -34,11 +44,18 @@ const createRoom = async () => {
 
 <template>
   <div class="pa-4">
-    <div class="d-flex justify-space-between align-center">
+    <div
+      class="d-flex justify-space-between align-center"
+      style="gap: 100px"
+    >
 
-      <h1>
-        Rooms
-      </h1>
+      <v-text-field
+        v-model="filterQuery"
+        prepend-inner-icon="mdi-magnify"
+        label="Search"
+        variant="outlined"
+        hide-details
+      ></v-text-field>
 
       <v-btn
         @click.stop="createRoom"
@@ -51,15 +68,16 @@ const createRoom = async () => {
         </v-icon>
       </v-btn>
 
-      <v-text-field
-        v-model="filterQuery"
-        label="Search"
-        outlined
-        dense
-        hide-details
-      ></v-text-field>
-
     </div>
+
+    <div class="pt-2 pb-1">
+      <h5 v-if="!loadingRooms">
+        {{ roomListLabel }}
+      </h5>
+    </div>
+
+    <v-divider></v-divider>
+
     <div class="py-2">
       <RoomList />
     </div>
