@@ -55,6 +55,7 @@ const createRoom = async () => {
         label="Search"
         variant="outlined"
         hide-details
+        clearable
       ></v-text-field>
 
       <v-btn
