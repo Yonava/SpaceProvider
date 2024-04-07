@@ -19,7 +19,13 @@ export const useRooms = defineStore('rooms', () => {
     const query = filterQuery.value.toLowerCase()
     return rooms.value.filter(room => {
       const roomFields = Object.values(room).map(val => String(val).toLowerCase())
-      return roomFields.some(field => field.includes(query))
+      const { building, room: roomNumber } = room
+      const specialCases = [
+        `${building} ${roomNumber}`,
+        `${building}-${roomNumber}`,
+        `${building}${roomNumber}`
+      ].map(val => val.toLowerCase())
+      return roomFields.some(field => field.includes(query)) || specialCases.some(field => field.includes(query))
     });
   });
 
