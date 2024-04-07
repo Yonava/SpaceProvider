@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { compressImage } from '../compression';
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const fileUploadError = ref<string | null>(null);
@@ -52,6 +53,11 @@ const onFileChange = (e: Event) => {
   }
 
   const handleEncodedImages = (encodedImages: string[]) => {
+    const compressedImages = encodedImages.map(compressImage);
+
+    console.log('non-compressed', getImageSize(encodedImages[0]))
+    console.log('compressed', getImageSize(compressedImages[0]))
+
     const MAX_MB_ALLOWANCE = 2;
     const compliantImages = encodedImages.filter(filterImagesOnMaxMB(MAX_MB_ALLOWANCE));
     if (compliantImages.length !== encodedImages.length) {
