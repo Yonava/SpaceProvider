@@ -11,8 +11,8 @@ const getRooms = async () => {
   return data
 }
 
-const getRoom = async (mongoId: string) => {
-  const { data } = await axios.get<PostedRoom>(`${URI}${mongoId}`)
+const getRoom = async (_id: string) => {
+  const { data } = await axios.get<PostedRoom>(`${URI}${_id}`)
   return data
 }
 
@@ -26,8 +26,8 @@ const updateRoom = async <T extends PostedRoom>(room: T) => {
   return data
 }
 
-const deleteRoom = async (mongoId: string) => {
-  const { data } = await axios.delete<{ message: 'Room deleted' }>(`${URI}${mongoId}`)
+const deleteRoom = async (_id: string) => {
+  const { data } = await axios.delete<{ message: 'Room deleted' }>(`${URI}${_id}`)
   return data
 }
 
