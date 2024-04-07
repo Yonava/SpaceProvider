@@ -27,7 +27,7 @@ app.get('/room', (req, res) => {
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(__dirname + '/public/'));
-  app.get('/edit', (req, res) => res.sendFile(__dirname + '/public/index.html'));
+  app.get('/admin', (req, res) => res.sendFile(__dirname + '/public/index.html'));
 }
 
 const PORT = process.env.PORT || 3000;

@@ -13,10 +13,5 @@ export default defineConfig({
   plugins: [vue()],
   build: {
     outDir: '../server/public'
-  },
-  server: {
-    proxy: {
-      '/api': 'http://localhost:3000/admin/'
-    }
   }
 })
