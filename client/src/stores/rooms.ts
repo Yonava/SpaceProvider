@@ -6,6 +6,7 @@ import type { Room, PostedRoom } from '../rooms'
 export const useRooms = defineStore('rooms', () => {
 
   const rooms = ref<PostedRoom[]>([])
+  const loadingRooms = ref(false)
   const currentRoom = ref<PostedRoom | null>(null)
 
   const setCurrentRoom = (room: PostedRoom | null) => {
@@ -23,7 +24,9 @@ export const useRooms = defineStore('rooms', () => {
   });
 
   const fetchRooms = async () => {
+    loadingRooms.value = true
     rooms.value = await getRooms()
+    loadingRooms.value = false
   }
 
   const saveRoom = async (room: Room | PostedRoom) => {
@@ -69,6 +72,8 @@ export const useRooms = defineStore('rooms', () => {
     currentRoom,
     setCurrentRoom,
     saveRoom,
-    removeRoom
+    removeRoom,
+    fetchRooms,
+    loadingRooms
   }
 })

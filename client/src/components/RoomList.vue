@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import RoomListItem from './RoomListItem.vue';
 import { useRooms } from '../stores/rooms';
 
-const { displayedRooms } = storeToRefs(useRooms());
+const { displayedRooms, loadingRooms } = storeToRefs(useRooms());
 const { setCurrentRoom, removeRoom } = useRooms();
 </script>
 
@@ -21,6 +21,12 @@ const { setCurrentRoom, removeRoom } = useRooms();
         :room="room"
       />
     </div>
+  </div>
+  <div v-else-if="loadingRooms">
+    <v-progress-linear
+      color="primary"
+      indeterminate
+    />
   </div>
   <div v-else>
     <h1>
