@@ -6,10 +6,10 @@
 const { ERRORS, respondWithError } = require('./constants');
 
 /**
- * @typedef {Object} RateLimitingOptions
+ * @typedef {Object} RATE_LIMITER_DEFAULTS
  * @desc defaults for rate limiting options
  */
-const defaultRateLimitingOptions = {
+const RATE_LIMITER_DEFAULTS = {
   requestLimit: 10,
   backoffDurationMs: 2000,
   paths: [],
@@ -29,7 +29,7 @@ function limitRequestRate(options) {
     requestLimit,
     paths,
     backoffDurationMs,
-  } = { ...defaultRateLimitingOptions, ...options };
+  } = { ...RATE_LIMITER_DEFAULTS, ...options };
 
   let numOfRequests = 0;
 
@@ -39,7 +39,6 @@ function limitRequestRate(options) {
     setTimeout(() => numOfRequests--, backoffDurationMs);
 
     const onProtectedPath = paths.some(path => req.path.includes(path));
-    console.log('onProtectedPath', onProtectedPath);
     if (!onProtectedPath) {
       next();
       return;

@@ -4,13 +4,17 @@ import { getRooms, postRoom, updateRoom, deleteRoom } from '../api'
 import type { Room, PostedRoom } from '../rooms'
 import { search } from '../search'
 
+const serialize = <T extends Record<any, any>>(obj: T) => JSON.stringify(obj);
+
 export const useRooms = defineStore('rooms', () => {
 
   const rooms = ref<PostedRoom[]>([])
   const loadingRooms = ref(false)
   const currentRoom = ref<PostedRoom | null>(null)
+  const serializedCurrentRoom = ref('')
 
   const setCurrentRoom = (room: PostedRoom | null) => {
+    if (room) serializedCurrentRoom.value = serialize(room)
     currentRoom.value = room
   }
 
@@ -25,6 +29,12 @@ export const useRooms = defineStore('rooms', () => {
 
   const saveRoom = async (room: Room | PostedRoom) => {
 
+    const currentRoomEdited = serialize(room) !== serializedCurrentRoom.value
+    if (!currentRoomEdited) {
+      console.log('no changes')
+      return
+    }
+
     room.last_edited = new Date()
 
     if ('_id' in room) {
@@ -32,7 +42,6 @@ export const useRooms = defineStore('rooms', () => {
         return await updateRoom(room)
       } catch (err) {
         console.log('failed to update')
-        // location.reload()
         console.error(err)
       }
     }
@@ -42,7 +51,6 @@ export const useRooms = defineStore('rooms', () => {
       rooms.value.unshift(res)
       return res
     } catch (err) {
-      // location.reload()
       console.error(err)
     }
   }

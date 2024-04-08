@@ -38,7 +38,7 @@ app.use('/api/v1', v1API);
  */
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the space provider API! 🚀. Try /api/v1?room=ILC-S140!',
+    message: 'Welcome to the Space Provider API! 🚀. Try /api/v1?room=ILC-S140!',
     version: 1,
   });
 });

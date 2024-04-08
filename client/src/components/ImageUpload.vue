@@ -95,9 +95,9 @@ const removeImage = (image: string) => {
 <template>
   <div>
     <v-btn
+      @click.stop="fileInput!.click()"
       color="primary"
       size="small"
-      @click.stop="fileInput!.click()"
     >
       Upload Image
     </v-btn>
@@ -111,9 +111,9 @@ const removeImage = (image: string) => {
 
     <input
       v-show="false"
+      @change="onFileChange"
       type="file"
       ref="fileInput"
-      @change="onFileChange"
     />
   </div>
   <div>
@@ -124,7 +124,6 @@ const removeImage = (image: string) => {
     >
       <img
         :src="image"
-        :key="image"
         style="object-fit: cover; height: 100%; width: 100%;"
       />
       <div
