@@ -2,10 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Room = require('../../schemas/rooms');
 
-const BATCH_GET_PROJ = {
-  images: { $slice: 1 },
-}
-
 const ERRORS = {
   INVALID_ROOM_ID: 'INVALID_ROOM_ID',
   INVALID_GPS_COORDS: 'INVALID_GPS_COORDS',
@@ -133,7 +129,7 @@ router.get('/', async (req, res) => {
 
   try {
     const rooms = await Room
-      .find(batchGetOptions, BATCH_GET_PROJ)
+      .find(batchGetOptions, { images: { $slice: 1 } })
       .limit(limitNum)
       .skip(skipNum);
 
