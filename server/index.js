@@ -5,9 +5,17 @@ const adminAPI = require('./api/admin');
 const v1API = require('./api/v1/index');
 require('dotenv').config();
 const mongoose = require('mongoose');
+const { limitRequestRate } = require('./rateLimiter')
 const { MONGO_URI } = process.env;
 
 mongoose.connect(MONGO_URI);
+
+const rateLimiter = limitRequestRate({
+  requestLimit: 2,
+  backoffDurationMs: 2000,
+})
+
+app.use(rateLimiter);
 
 // 50mb limit for image uploads
 app.use(cors());

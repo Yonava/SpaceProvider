@@ -19,6 +19,7 @@ const ERRORS = {
  * @typedef {Object} ErrorOptions
  * @property {string} message - the error message
  * @property {string} error - the error code defined in ERRORS
+ * @property {number} status - the status code of the error
  */
 
 /**
@@ -27,7 +28,8 @@ const ERRORS = {
   @param {Object} errOptions - the error options object
 */
 const respondWithError = (res) => (errOptions) => {
-  res.status(400).json(errOptions);
+  const status = errOptions.status ?? 400;
+  res.status(status).json(errOptions);
 }
 
 module.exports = {

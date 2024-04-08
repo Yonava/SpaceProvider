@@ -27,7 +27,8 @@ router.get('/', async (req, res) => {
     } catch (error) {
       return sendError({
         message: `error fetching room from database with the provided room parameter ${building} ${roomNum}`,
-        error: ERRORS.UNKNOWN_EXCEPTION
+        error: ERRORS.UNKNOWN_EXCEPTION,
+        status: 500,
       });
     }
     return;
@@ -41,7 +42,8 @@ router.get('/', async (req, res) => {
     } catch (error) {
       return sendError({
         message: `error fetching room from database with the provided _id ${_id}`,
-        error: ERRORS.UNKNOWN_EXCEPTION
+        error: ERRORS.UNKNOWN_EXCEPTION,
+        status: 500,
       });
     }
     return;
@@ -130,9 +132,10 @@ router.get('/', async (req, res) => {
       rooms
     });
   } catch (error) {
-    res.status(500).json({
-      message: 'error occurred while batch fetching rooms from database',
-      error: ERRORS.UNKNOWN_EXCEPTION
+    sendError({
+      message: 'Error getting rooms',
+      error: ERRORS.UNKNOWN_EXCEPTION,
+      status: 500,
     });
   }
 });

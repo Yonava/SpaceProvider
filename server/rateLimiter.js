@@ -1,38 +1,56 @@
 
+const { ERRORS, respondWithError } = require('./constants');
+
 /**
  * Rate limiting middleware
- *
+ * @param {Object} options
+ * @param {number} options.requestLimit - the number of requests allowed in the duration
+ * @param {string[]} options.paths - the paths to apply rate limiting to
+ * @param {number} options.backoffDurationMs - time it takes for the request count to decrement
+ * @returns {Function} the rate limiting middleware
  */
 
 const defaultRateLimitingOptions = {
   requestLimit: 10,
   paths: ['/api/v1'],
-  durationInMs: 2000,
+  backoffDurationMs: 2000,
 }
 
-export const limitRequestRate = (options) => {
+function limitRequestRate(options) {
 
   const {
     requestLimit,
     paths,
-    durationInMs,
+    backoffDurationMs,
   } = { ...defaultRateLimitingOptions, ...options };
 
   let numOfRequests = 0;
 
   return (req, res, next) => {
-    console.log(req.path)
-    const onProtectedPath = paths.some(path => req.path.includes(path));
-    if (onProtectedPath) {
-      console.log('on protected path');
-      next();
-    } else {
-      res.status(429).json({
-        message: 'Rate limit exceeded, chill out',
-      });
-    }
 
     numOfRequests++;
-    setTimeout(() => numOfRequests--, durationInMs);
+    setTimeout(() => numOfRequests--, backoffDurationMs);
+
+    const onProtectedPath = paths.some(path => req.path.includes(path));
+    if (!onProtectedPath) {
+      next();
+      return;
+    }
+
+    const underLimit = numOfRequests < requestLimit;
+    if (underLimit) {
+      next();
+      return
+    }
+
+    respondWithError(res)({
+      message: 'Rate limit exceeded',
+      error: ERRORS.RATE_LIMIT_EXCEEDED,
+      status: 429,
+    });
   }
 }
+
+module.exports = {
+  limitRequestRate,
+};
