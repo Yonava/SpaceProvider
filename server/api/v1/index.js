@@ -1,28 +1,7 @@
 const express = require('express');
+const { ERRORS, respondWithError } = require('../../constants');
 const router = express.Router();
 const Room = require('../../schemas/rooms');
-
-const ERRORS = {
-  INVALID_ROOM_ID: 'INVALID_ROOM_ID',
-  INVALID_GPS_COORDS: 'INVALID_GPS_COORDS',
-  INVALID_PAGE_PARAMS: 'INVALID_PAGE_PARAMS',
-  UNKNOWN_EXCEPTION: 'UNKNOWN_EXCEPTION',
-}
-
-/**
- * @typedef {Object} ErrorOptions
- * @property {string} message - the error message
- * @property {string} error - the error code defined in ERRORS
- */
-
-/**
-  Terminates the request with an error response
-  @param {Object} res - the response object
-  @param {Object} errOptions - the error options object
-*/
-const respondWithError = (res) => (errOptions) => {
-  res.status(400).json(errOptions);
-}
 
 router.get('/', async (req, res) => {
 

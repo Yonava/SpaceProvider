@@ -19,7 +19,7 @@ export const limitRequestRate = (options) => {
   } = { ...defaultRateLimitingOptions, ...options };
 
   let numOfRequests = 0;
-  let lastRequestTime = Date.now();
+
   return (req, res, next) => {
     console.log(req.path)
     const onProtectedPath = paths.some(path => req.path.includes(path));
@@ -31,5 +31,8 @@ export const limitRequestRate = (options) => {
         message: 'Rate limit exceeded, chill out',
       });
     }
+
+    numOfRequests++;
+    setTimeout(() => numOfRequests--, durationInMs);
   }
 }
