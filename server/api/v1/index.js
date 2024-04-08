@@ -1,3 +1,11 @@
+/**
+ * @module api/v1
+ * @desc API routes for the SpaceProvider API version 1
+ * @requires {@link external:express}
+ * @requires {@link module:server/schemas/rooms}
+ * @requires {@link module:server/constants}
+ */
+
 const express = require('express');
 const { ERRORS, respondWithError } = require('../../constants');
 const Room = require('../../schemas/rooms');
@@ -28,7 +36,7 @@ router.get('/', async (req, res) => {
 
   const sendError = respondWithError(res);
 
-  // if the query has a room parameter, return the room with that id
+  // if the query has a room parameter, return room with corresponding building-room combination
   if (req.query.room) {
     const { room } = req.query;
     const [building, roomNum] = room.split('-');
@@ -55,6 +63,7 @@ router.get('/', async (req, res) => {
     return;
   }
 
+  // if the query has an _id parameter, return the room with that mongo assigned id
   if (req.query._id) {
     const { _id } = req.query;
     try {

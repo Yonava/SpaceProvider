@@ -1,21 +1,28 @@
+/**
+ * @module rateLimiter
+ * @desc provides rate limiting middleware for the server
+ */
 
 const { ERRORS, respondWithError } = require('./constants');
 
 /**
- * Rate limiting middleware
- * @param {Object} options
- * @param {number} options.requestLimit - the number of requests allowed in the duration
- * @param {string[]} options.paths - the paths to apply rate limiting to
- * @param {number} options.backoffDurationMs - time it takes for the request count to decrement
- * @returns {Function} the rate limiting middleware
+ * @typedef {Object} RateLimitingOptions
+ * @desc defaults for rate limiting options
  */
-
 const defaultRateLimitingOptions = {
   requestLimit: 10,
-  paths: ['/api/v1'],
   backoffDurationMs: 2000,
+  paths: [],
 }
 
+/**
+ * @desc provides a closure that limits the number of requests to the server on specific paths
+ * @param {Object} options
+ * @param {number} [options.requestLimit=10] - the number of requests allowed in the duration
+ * @param {string[]} [options.paths=[]] - the paths to apply rate limiting to
+ * @param {number} [options.backoffDurationMs=2000] - time it takes for the request count to decrement
+ * @returns {Function} the rate limiting middleware
+ */
 function limitRequestRate(options) {
 
   const {

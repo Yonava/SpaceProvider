@@ -1,29 +1,41 @@
+/**
+ * @module index
+ * @desc entry point for the space provider API
+ */
+
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const mongoose = require('mongoose');
+
 const adminAPI = require('./api/admin');
 const v1API = require('./api/v1/index');
-require('dotenv').config();
-const mongoose = require('mongoose');
 const { limitRequestRate } = require('./rateLimiter')
-const { MONGO_URI } = process.env;
 
+const { MONGO_URI } = process.env;
 mongoose.connect(MONGO_URI);
 
 const rateLimiter = limitRequestRate({
   requestLimit: 2,
   backoffDurationMs: 2000,
+  paths: ['/api/v1'],
 })
 
 app.use(rateLimiter);
 
 // 50mb limit for image uploads
-app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+app.use(cors());
 
 app.use('/admin/api', adminAPI);
 app.use('/api/v1', v1API);
 
+/**
+ * @GET /
+ * @desc teaser message for the API
+ */
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the space provider API! 🚀. Try /api/v1?room=ILC-S140!',

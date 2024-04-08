@@ -1,3 +1,8 @@
+/**
+ * @module server/api/admin
+ * @desc api endpoints for admin operations on rooms
+ */
+
 const express = require('express');
 const router = express.Router();
 const Room = require('../schemas/rooms');
@@ -28,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  console.log('POST /rooms', req.body);
+  console.log('POST /rooms', req.body.building, req.body.room);
   const { body } = req;
   try {
     const room = new Room(body);
@@ -43,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  console.log('PUT /rooms/:id', req.params.id, req.body);
+  console.log('PUT /rooms/:id', req.body.building, req.body.room);
   const { id } = req.params;
   const { body } = req;
   try {

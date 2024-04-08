@@ -1,5 +1,10 @@
 
 /**
+ * @module constants
+ * @desc Defines constants for the server
+ */
+
+/**
  * @typedef {Object} ERRORS
  * @property {string} INVALID_ROOM_ID - error code for invalid room id
  * @property {string} INVALID_GPS_COORDS - error code for invalid gps coordinates
