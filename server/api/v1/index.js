@@ -1,8 +1,29 @@
 const express = require('express');
 const { ERRORS, respondWithError } = require('../../constants');
-const router = express.Router();
 const Room = require('../../schemas/rooms');
+const router = express.Router();
 
+/**
+ * Default pagination options for batch get requests
+ * @property {number} limit - the max number of results per page
+ * @property {number} page - the page of results to get. One indexed
+ */
+const PAGINATION_DEFAULTS = {
+  limit: 20,
+  page: 1,
+}
+
+/**
+ * @GET /api/v1
+ * @description Get rooms from the SpaceProvider database based on query parameters
+ * @query {string} room - the room to get, formatted as building-room
+ * @query {string} _id - the mongo assigned id of the room to get
+ * @query {string} q - search query to match against all rooms
+ * @query {number} lat - latitude for sorting queried rooms by distance
+ * @query {number} lon - longitude for sorting queried rooms by distance
+ * @query {number} [limit=20] - pagination option to set the max number of results per page. Default is 20
+ * @query {number} [page=1] - pagination option to get a specific page of results. One indexed. Default is 1
+ */
 router.get('/', async (req, res) => {
 
   const sendError = respondWithError(res);
@@ -50,13 +71,21 @@ router.get('/', async (req, res) => {
   }
 
   // for batch get requests, takes pagination parameters
-  const { limit, skip } = req.query;
-  const limitNum = parseInt(limit) || 3;
-  const skipNum = parseInt(skip) || 0;
+  const { limit, page } = { ...PAGINATION_DEFAULTS, ...req.query };
 
-  if (isNaN(limitNum) || isNaN(skipNum)) {
+  const limitNum = parseInt(limit);
+  const pageNum = parseInt(page);
+
+  if (isNaN(limitNum) || isNaN(pageNum)) {
     return sendError({
-      message: 'Invalid limit/skip parameters. Both must be provided and be numbers',
+      message: 'Invalid limit/page parameters. Both must be provided and be numbers',
+      error: ERRORS.INVALID_PAGE_PARAMS
+    });
+  }
+
+  if (limitNum < 1 || pageNum < 1) {
+    return sendError({
+      message: 'Invalid limit/page parameters. Both must be greater than 0',
       error: ERRORS.INVALID_PAGE_PARAMS
     });
   }
@@ -112,12 +141,19 @@ router.get('/', async (req, res) => {
     const rooms = await Room
       .find(batchGetOptions, { images: { $slice: 1 } })
       .limit(limitNum)
-      .skip(skipNum);
+      .skip(limitNum * (pageNum - 1));
+
+    const total_results = await Room.countDocuments(batchGetOptions);
+    const total_pages = Math.ceil(total_results / limitNum);
+    const last_page = pageNum >= total_pages;
 
     const page = {
       limit: limitNum,
-      skip: skipNum,
-      results: rooms.length,
+      page: pageNum,
+      page_results: rooms.length,
+      total_results,
+      total_pages,
+      last_page
     }
 
     const options = {

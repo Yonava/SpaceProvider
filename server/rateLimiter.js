@@ -32,6 +32,7 @@ function limitRequestRate(options) {
     setTimeout(() => numOfRequests--, backoffDurationMs);
 
     const onProtectedPath = paths.some(path => req.path.includes(path));
+    console.log('onProtectedPath', onProtectedPath);
     if (!onProtectedPath) {
       next();
       return;
