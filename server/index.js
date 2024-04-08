@@ -19,7 +19,7 @@ app.use('/admin/api', adminAPI);
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the space provider API! 🚀. Try /room?id=LIB-350!'
+    message: 'Welcome to the space provider API! 🚀. Try /room?id=ILC-S140!'
   });
 });
 
