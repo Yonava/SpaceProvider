@@ -43,42 +43,50 @@ const createRoom = async () => {
 </script>
 
 <template>
-  <div class="pa-4">
+  <div class="mx-4" style="position: relative;">
     <div
-      class="d-flex justify-space-between align-center"
-      style="gap: 100px"
+      class="py-3"
+      style="position: sticky; top: 0; z-index: 2; width: 100%; background: white;"
     >
-
-      <v-text-field
-        v-model="filterQuery"
-        prepend-inner-icon="mdi-magnify"
-        label="Search"
-        variant="outlined"
-        hide-details
-      ></v-text-field>
-
-      <v-btn
-        @click.stop="createRoom"
-        :loading="addLoading"
-        color="green"
-        icon
+      <div
+        class="d-flex justify-space-between align-center"
+        style="gap: 100px"
       >
-        <v-icon>
-          mdi-plus
-        </v-icon>
-      </v-btn>
 
-    </div>
+        <v-text-field
+          v-model="filterQuery"
+          prepend-inner-icon="mdi-magnify"
+          label="Search"
+          variant="outlined"
+          hide-details
+        ></v-text-field>
 
-    <div class="pt-2 pb-1">
-      <h5 v-if="!loadingRooms">
-        {{ roomListLabel }}
-      </h5>
+        <v-btn
+          @click.stop="createRoom"
+          :loading="addLoading"
+          color="green"
+          icon
+        >
+          <v-icon>
+            mdi-plus
+          </v-icon>
+        </v-btn>
+
+      </div>
+
+      <div class="pt-2 pb-1">
+        <h5 v-if="!loadingRooms">
+          {{ roomListLabel }}
+        </h5>
+      </div>
     </div>
 
     <v-divider></v-divider>
 
-    <div class="py-2">
+    <div
+      class="mt-2"
+      style="margin-bottom: 400px;"
+    >
       <RoomList />
     </div>
   </div>
