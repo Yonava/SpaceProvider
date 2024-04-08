@@ -15,4 +15,6 @@ const room = Schema({
   last_edited: Date
 });
 
+room.index({ 'gps_coords': '2dsphere' });
+
 module.exports = mongoose.model('Room', room);
