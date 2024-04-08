@@ -61,3 +61,5 @@ export const newRoom = (building: Building): Room => ({
   capacity: 0,
   last_edited: new Date(),
 })
+
+export const serializeRoom = (obj: Record<any, any>) => JSON.stringify(obj);

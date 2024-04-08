@@ -2,9 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
 import { getRooms, postRoom, updateRoom, deleteRoom } from '../api'
 import type { Room, PostedRoom } from '../rooms'
+import { serializeRoom } from '../rooms'
 import { search } from '../search'
-
-const serialize = <T extends Record<any, any>>(obj: T) => JSON.stringify(obj);
 
 export const useRooms = defineStore('rooms', () => {
 
@@ -14,7 +13,7 @@ export const useRooms = defineStore('rooms', () => {
   const serializedCurrentRoom = ref('')
 
   const setCurrentRoom = (room: PostedRoom | null) => {
-    if (room) serializedCurrentRoom.value = serialize(room)
+    if (room) serializedCurrentRoom.value = serializeRoom(room)
     currentRoom.value = room
   }
 
@@ -29,7 +28,7 @@ export const useRooms = defineStore('rooms', () => {
 
   const saveRoom = async (room: Room | PostedRoom) => {
 
-    const currentRoomEdited = serialize(room) !== serializedCurrentRoom.value
+    const currentRoomEdited = serializeRoom(room) !== serializedCurrentRoom.value
     if (!currentRoomEdited) {
       console.log('no changes')
       return
