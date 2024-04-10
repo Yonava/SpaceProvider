@@ -64,7 +64,16 @@ export const useRooms = defineStore('rooms', () => {
     }
   }
 
-  onMounted(fetchRooms)
+  onMounted(async () => {
+    await fetchRooms()
+    const urlParams = new URLSearchParams(window.location.search)
+    const roomId = urlParams.get('room')
+    if (!roomId) return
+    const [building, room] = roomId.split('-')
+    const roomToOpen = rooms.value.find(r => r.building === building && r.room === room)
+    if (!roomToOpen) return
+    setCurrentRoom(roomToOpen)
+  })
 
   return {
     filterQuery,
