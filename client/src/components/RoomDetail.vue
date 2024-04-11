@@ -11,7 +11,7 @@ const props = defineProps<{
 }>();
 
 const getLiveGPS = async () => {
-  props.room.gps_coords = await getCoords();
+  props.room.gps_coords.coordinates = await getCoords();
 };
 </script>
 
@@ -86,12 +86,12 @@ const getLiveGPS = async () => {
       style="gap: 20px"
     >
       <v-text-field
-        v-model="props.room.gps_coords.lat"
+        v-model="props.room.gps_coords.coordinates[0]"
         label="Lat"
       />
 
       <v-text-field
-        v-model="props.room.gps_coords.lon"
+        v-model="props.room.gps_coords.coordinates[1]"
         label="Lon"
       />
     </div>

@@ -33,17 +33,19 @@ export type RoomLabel = typeof labels[number]
 
 export type Building = typeof buildings[number]
 
-export type GPSCoord = {
-  lat: number,
-  lon: number
+export type GPSCoord = [number, number]
+export type GPSData = {
+  type: 'Point',
+  coordinates: GPSCoord
 }
+
 
 export type Room = {
   building: Building,
   room: string,
   access_notes: string,
   images: string[],
-  gps_coords: GPSCoord,
+  gps_coords: GPSData,
   labels: RoomLabel[],
   capacity: number,
   last_edited: Date,
@@ -56,7 +58,10 @@ export const newRoom = (building: Building): Room => ({
   room: '',
   access_notes: '',
   images: [],
-  gps_coords: { lat: 0, lon: 0 },
+  gps_coords: {
+    type: 'Point',
+    coordinates: [0, 0]
+  },
   labels: [],
   capacity: 0,
   last_edited: new Date(),

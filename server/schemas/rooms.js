@@ -8,21 +8,20 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const roomShape = {
+const room = Schema({
   building: String,
   room: String,
   access_notes: String,
   images: [String],
   gps_coords: {
-    lat: Number,
-    lon: Number
+    type: { type: String, default: 'Point' }, // GeoJSON type
+    coordinates: { type: [Number], default: [0, 0] } // Longitude (lon), Latitude (lat)
   },
   labels: [String],
   capacity: Number,
   last_edited: Date
-}
+});
 
-const room = Schema(roomShape);
-room.index({ 'gps_coords': '2dsphere' });
+room.index({ gps_coords: '2dsphere' });
 
 module.exports = mongoose.model('Room', room);

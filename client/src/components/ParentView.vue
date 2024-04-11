@@ -26,12 +26,12 @@ const createRoom = async () => {
   addLoading.value = true;
   const currentCoords = await getCoords();
   const sortedRooms = rooms.slice().sort((a, b) => {
-    const distA = getDistanceInMeters(currentCoords, a.gps_coords);
-    const distB = getDistanceInMeters(currentCoords, b.gps_coords);
+    const distA = getDistanceInMeters(currentCoords, a.gps_coords.coordinates);
+    const distB = getDistanceInMeters(currentCoords, b.gps_coords.coordinates);
     return distA - distB;
   });
   const room = newRoom(sortedRooms[0]?.building ?? '');
-  room.gps_coords = await getCoords();
+  room.gps_coords.coordinates = await getCoords();
   const postedRoom = await saveRoom(room);
   if (!postedRoom) {
     console.warn('Failed to create room');

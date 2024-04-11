@@ -177,6 +177,7 @@ router.get('/', async (req, res) => {
       rooms
     });
   } catch (error) {
+    console.error('error', error);
     sendError({
       message: 'Error getting rooms',
       error: ERRORS.UNKNOWN_EXCEPTION,

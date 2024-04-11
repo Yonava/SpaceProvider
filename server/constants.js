@@ -33,8 +33,9 @@ const ERRORS = {
   @param {Object} errOptions - the error options object
 */
 const respondWithError = (res) => (errOptions) => {
-  const status = errOptions.status ?? 400;
-  res.status(status).json(errOptions);
+  const { status, ...rest } = errOptions;
+  status ??= 400;
+  res.status(status).json(rest);
 }
 
 module.exports = {
