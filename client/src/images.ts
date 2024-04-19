@@ -99,8 +99,14 @@ export async function uploadImageFilePipeline(
   maxWidthOrHeight: number,
 ): Promise<string> {
   try {
-    // maps the mbLimit values to what should be used for base64
-    // ceil(num_bytes * 3) * 4
+    /* 
+     * This array represents mappings from maximum MB for file to maximum MB for base64 encoded 
+     * file. The formula to get these values: 
+     * ceil(file_size_in_bytes / 3) * 4 = base64_size_in_bytes (solve for file_size_in_bytes)
+     * In other words, if we want our encoded string to be at most 2 MB in size, our JPEG must
+     * be at most 1.4999980926513672 MB in size. Our map goes up to 10 MB (realistically we
+     * probably won't need that much room).
+     */
     const maxSizeBase64Map = [
       0,
       0.7499980926513672, 
