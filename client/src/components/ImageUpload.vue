@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { compressImage } from '../compression';
+import { isImageFormat, uploadImageFilePipeline } from '../images';
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const fileUploadError = ref<string | null>(null);
@@ -13,15 +13,7 @@ const emits = defineEmits<{
   (e: 'update:modelValue', value: string[]): void;
 }>()
 
-const encodeImage = (file: File) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  return new Promise<string>((resolve) => {
-    reader.onload = () => {
-      resolve(reader.result as string);
-    };
-  });
-};
+const MAX_MB_ALLOWANCE = 2;
 
 const getImageSize = (image: string, unit: 'mb' | 'kb' = 'mb') => {
   const sizeInBytes = (image.length * 3) / 4 - 2;
@@ -34,32 +26,9 @@ const imageSizeLabel = (image: string) => {
   return `${size.value.toFixed(1)} ${size.unit.toUpperCase()}`;
 };
 
-const filterImagesOnMaxMB = (maxMb: number) => (image: string) => {
-  const size = getImageSize(image);
-  return size.value <= maxMb;
-};
-
 const onFileChange = (e: Event) => {
-  fileUploadError.value = null;
-  const files = (e.target as HTMLInputElement).files;
-  if (!files) return;
-
-  const images = Array.from(files).filter((file) => file.type.startsWith('image/'));
-
-  if (images.length === 0) {
-    console.warn('uploaded files must be images');
-    fileUploadError.value = 'Uploaded files must be images';
-    return;
-  }
-
-  const handleEncodedImages = (encodedImages: string[]) => {
-    const compressedImages = encodedImages.map(compressImage);
-
-    console.log('non-compressed', getImageSize(encodedImages[0]))
-    console.log('compressed', getImageSize(compressedImages[0]))
-
-    const MAX_MB_ALLOWANCE = 2;
-    const compliantImages = encodedImages.filter(filterImagesOnMaxMB(MAX_MB_ALLOWANCE));
+  const handleEncodedImages = (encodedImages: string[]) => {    
+    const compliantImages = encodedImages.filter(img => getImageSize(img).value <= MAX_MB_ALLOWANCE);
     if (compliantImages.length !== encodedImages.length) {
       if (compliantImages.length !== 0) {
         console.warn(`some images exceed ${MAX_MB_ALLOWANCE}MB limit and have been discarded`);
@@ -71,7 +40,7 @@ const onFileChange = (e: Event) => {
     }
     emits('update:modelValue', [...compliantImages, ...props.modelValue]);
   };
-
+  
   const handleEncodedImagesError = (error: unknown) => {
     console.warn('cannot encode images')
     console.error('Error encoding images:', error);
@@ -82,7 +51,12 @@ const onFileChange = (e: Event) => {
     }
   };
 
-  Promise.all(images.map(encodeImage))
+  fileUploadError.value = null;
+  const files = (e.target as HTMLInputElement).files;
+  if (!files) return;
+
+  const images = Array.from(files);
+  Promise.all(images.map(img => uploadImageFilePipeline(img, MAX_MB_ALLOWANCE)))
     .then(handleEncodedImages)
     .catch(handleEncodedImagesError);
 };
