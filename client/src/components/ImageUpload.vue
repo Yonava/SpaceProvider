@@ -4,6 +4,7 @@ import { uploadImageFilePipeline } from '../images';
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const fileUploadError = ref<string | null>(null);
+const isWorking = ref<boolean>(false);
 
 const props = defineProps<{
   modelValue: string[];
@@ -60,6 +61,7 @@ const onFileChange = (e: Event) => {
     }
   };
 
+  isWorking.value = true;
   fileUploadError.value = null;
   const files = (e.target as HTMLInputElement).files;
   if (!files) return;
@@ -67,7 +69,7 @@ const onFileChange = (e: Event) => {
   const images = Array.from(files);
   Promise.all(images.map(img => 
     uploadImageFilePipeline(img, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
-  )).then(handleEncodedImages)
+  )).then(imgs => { handleEncodedImages(imgs); isWorking.value = false })
     .catch(handleEncodedImagesError);
 };
 
@@ -98,6 +100,7 @@ const removeImage = (image: string) => {
       @change="onFileChange"
       type="file"
       ref="fileInput"
+      multiple="true"
     />
   </div>
   <div>
@@ -131,10 +134,16 @@ const removeImage = (image: string) => {
       </div>
     </div>
     <h1
-      v-if="props.modelValue.length === 0"
+      v-if="props.modelValue.length === 0 && !isWorking"
       class="py-2 text-red"
     >
       No images uploaded
+    </h1>
+    <h1
+      v-if="isWorking && !fileUploadError"
+      class="py-2 text-blue"
+    >
+      Encoding image(s)...
     </h1>
   </div>
 </template>
