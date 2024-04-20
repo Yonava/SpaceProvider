@@ -1,10 +1,8 @@
 import imageCompression from "browser-image-compression";
 import heic2any from "heic2any";
 
-type sizeMB = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-
 /**
- * @description Check if the file is an accepted image format.
+ * @description Checks if the file is an accepted image format.
  * @param file
  * @returns a boolean value that indicates if the file is an accepted image format
  */
@@ -21,11 +19,11 @@ function isImageFormat(file: File): boolean {
 }
 
 /**
- * @description Converts inputted hei
- * @param file
- * @returns
+ * @description Converts input heic/heif file to jpeg file.
+ * @param file heic/heif file
+ * @returns a promise that resolves to a new File object with the jpeg format
  */
-async function convertHeicToJPEG(file: File): Promise<File> {
+async function convertHeicToJpeg(file: File): Promise<File> {
   let convertedBlob = await heic2any({
     blob: file,
     toType: "image/jpeg",
@@ -38,29 +36,29 @@ async function convertHeicToJPEG(file: File): Promise<File> {
 }
 
 /**
- * @description Check if the file is HEIC/HEIF format.
+ * @description Checks if the file is heic/heif format.
  * @param file
- * @returns a boolean value that indicates if the file is HEIC/HEIF format
+ * @returns a boolean value that indicates if the file is heic/heif format
  */
-function isHEIC(file: File): boolean {
+function isHeic(file: File): boolean {
   return file.type === "image/heic" || file.type === "image/heif";
 }
 
 /**
- * @description Converts the image to a jpeg format, compressing it to be within a
+ * @description Converts the image to jpeg format, compressing it to be within a
  * certain file size.
  * @param file
- * @param maxSizeMB
- * @param maxWidthOrHeight
+ * @param maxSizeMB in MB
+ * @param maxWidthOrHeight in pixels
  * @returns a promise that resolves to a new File object with the jpeg format
  */
-async function convertToJPEG(
+async function convertToJpeg(
   file: File,
   maxSizeMB: number,
   maxWidthOrHeight: number,
 ): Promise<File> {
-  if (isHEIC(file)) {
-    file = await convertHeicToJPEG(file);
+  if (isHeic(file)) {
+    file = await convertHeicToJpeg(file);
   }
   return await imageCompression(file, {
     maxSizeMB,
@@ -86,51 +84,34 @@ function encodeToBase64(file: File): Promise<string> {
 }
 
 /**
- * @description Takes a file and limit (in MB) and converts said file to a jpeg format under the
- * limit.
+ * @description Takes a file, maximum size (in MB), maximum height or width (in pixels) and 
+ * converts said file to a jpeg format under the two limits.
  * @param file
- * @param maxSizeMB
- * @param maxWidthOrHeight
+ * @param maxSizeBase64 in MB
+ * @param maxWidthOrHeight in pixels
  * @returns a promise that resolves to a string of the file encoded in base64
  */
 export async function uploadImageFilePipeline(
   file: File,
-  maxSizeMB: sizeMB,
+  maxSizeOfBase64: number,
   maxWidthOrHeight: number,
 ): Promise<string> {
-  try {
-    /* 
-     * This array represents mappings from maximum MB for file to maximum MB for base64 encoded 
-     * file. The formula to get these values: 
-     * ceil(file_size_in_bytes / 3) * 4 = base64_size_in_bytes (solve for file_size_in_bytes)
-     * In other words, if we want our encoded string to be at most 2 MB in size, our JPEG must
-     * be at most 1.4999980926513672 MB in size. Our map goes up to 10 MB (realistically we
-     * probably won't need that much room).
-     */
-    const maxSizeBase64Map = [
-      0,
-      0.7499980926513672, 
-      1.4999980926513672, 
-      2.249998092651367,
-      2.999998092651367, 
-      3.749998092651367, 
-      4.499998092651367,
-      5.249998092651367, 
-      5.999998092651367, 
-      6.749998092651367,
-      7.499998092651367,
-    ];
-    if (!isImageFormat(file)) {
-      throw new Error("File must be a jpeg, png, webp, bmp, or heic/heif");
-    }
-    const jpegFile = await convertToJPEG(
-      file,
-      maxSizeBase64Map[maxSizeMB],
-      maxWidthOrHeight,
-    );
-    return await encodeToBase64(jpegFile);
-  } catch (e) {
-    console.error("Conversion to JPEG failed:", e);
-    throw e;
+  /**
+   * @description Takes a number representing the size in MB of a base64 string and returns 
+   * corresponding file's estimated size.
+   * @param sizeMB size in MB of base64 string
+   * @returns estimation of size in MB of base64 string's corresponding file
+   */
+  const base64ToFileSize = (sizeMbBase64: number) => 
+    (3 * Math.ceil((sizeMbBase64 * 1000 * 1000) / 4)) / (1000 * 1000);
+
+  if (!isImageFormat(file)) {
+    throw new Error("Uploaded file(s) must be jpeg, png, webp, bmp, or heic/heif format");
   }
+  const jpegFile = await convertToJpeg(
+    file,
+    base64ToFileSize(maxSizeOfBase64),
+    maxWidthOrHeight,
+  );
+  return await encodeToBase64(jpegFile);
 }
