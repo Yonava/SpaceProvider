@@ -130,7 +130,7 @@ export async function uploadImageFilePipeline(
     );
     return await encodeToBase64(jpegFile);
   } catch (e) {
-    console.error("JPEG Conversion/compression failed:", e);
+    console.error("Conversion to JPEG failed:", e);
     throw e;
   }
 }
