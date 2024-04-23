@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { compressImage } from '../compression';
+import { uploadImageFilePipeline } from '../images';
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const fileUploadError = ref<string | null>(null);
+const isWorking = ref<boolean>(false);
 
 const props = defineProps<{
   modelValue: string[];
@@ -13,53 +14,31 @@ const emits = defineEmits<{
   (e: 'update:modelValue', value: string[]): void;
 }>()
 
-const encodeImage = (file: File) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  return new Promise<string>((resolve) => {
-    reader.onload = () => {
-      resolve(reader.result as string);
-    };
-  });
-};
+const MAX_MB_ALLOWANCE = 2;
+const MAX_WIDTH_OR_HEIGHT = 3840;
 
+/** 
+ * Takes an image as a base64 encoded string and a string that is either 'mb' (for mebibyte) or 
+ * 'kb' (for kibibyte) and returns an object containing the unit used and the size of the image.
+ */
 const getImageSize = (image: string, unit: 'mb' | 'kb' = 'mb') => {
   const sizeInBytes = (image.length * 3) / 4 - 2;
   return { unit, value: sizeInBytes / (1024 * (unit === 'mb' ? 1024 : 1)) }
 };
 
+/**
+ * Takes an image as a base64 encoded string and returns a string label representing the computed
+ * size of the image.
+ */
 const imageSizeLabel = (image: string) => {
   let size = getImageSize(image);
   if (!Math.floor(size.value)) size = getImageSize(image, 'kb');
   return `${size.value.toFixed(1)} ${size.unit.toUpperCase()}`;
 };
 
-const filterImagesOnMaxMB = (maxMb: number) => (image: string) => {
-  const size = getImageSize(image);
-  return size.value <= maxMb;
-};
-
 const onFileChange = (e: Event) => {
-  fileUploadError.value = null;
-  const files = (e.target as HTMLInputElement).files;
-  if (!files) return;
-
-  const images = Array.from(files).filter((file) => file.type.startsWith('image/'));
-
-  if (images.length === 0) {
-    console.warn('uploaded files must be images');
-    fileUploadError.value = 'Uploaded files must be images';
-    return;
-  }
-
-  const handleEncodedImages = (encodedImages: string[]) => {
-    const compressedImages = encodedImages.map(compressImage);
-
-    console.log('non-compressed', getImageSize(encodedImages[0]))
-    console.log('compressed', getImageSize(compressedImages[0]))
-
-    const MAX_MB_ALLOWANCE = 2;
-    const compliantImages = encodedImages.filter(filterImagesOnMaxMB(MAX_MB_ALLOWANCE));
+  const handleEncodedImages = (encodedImages: string[]) => {    
+    const compliantImages = encodedImages.filter(img => getImageSize(img).value <= MAX_MB_ALLOWANCE);
     if (compliantImages.length !== encodedImages.length) {
       if (compliantImages.length !== 0) {
         console.warn(`some images exceed ${MAX_MB_ALLOWANCE}MB limit and have been discarded`);
@@ -71,7 +50,7 @@ const onFileChange = (e: Event) => {
     }
     emits('update:modelValue', [...compliantImages, ...props.modelValue]);
   };
-
+  
   const handleEncodedImagesError = (error: unknown) => {
     console.warn('cannot encode images')
     console.error('Error encoding images:', error);
@@ -82,8 +61,15 @@ const onFileChange = (e: Event) => {
     }
   };
 
-  Promise.all(images.map(encodeImage))
-    .then(handleEncodedImages)
+  isWorking.value = true;
+  fileUploadError.value = null;
+  const files = (e.target as HTMLInputElement).files;
+  if (!files) return;
+
+  const images = Array.from(files);
+  Promise.all(images.map(img => 
+    uploadImageFilePipeline(img, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
+  )).then(imgs => { handleEncodedImages(imgs); isWorking.value = false })
     .catch(handleEncodedImagesError);
 };
 
@@ -114,6 +100,7 @@ const removeImage = (image: string) => {
       @change="onFileChange"
       type="file"
       ref="fileInput"
+      multiple="true"
     />
   </div>
   <div>
@@ -147,10 +134,16 @@ const removeImage = (image: string) => {
       </div>
     </div>
     <h1
-      v-if="props.modelValue.length === 0"
+      v-if="props.modelValue.length === 0 && !isWorking"
       class="py-2 text-red"
     >
       No images uploaded
+    </h1>
+    <h1
+      v-if="isWorking && !fileUploadError"
+      class="py-2 text-blue"
+    >
+      Encoding image(s)...
     </h1>
   </div>
 </template>
