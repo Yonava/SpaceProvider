@@ -17,9 +17,9 @@ const emits = defineEmits<{
 const MAX_MB_ALLOWANCE = 2;
 const MAX_WIDTH_OR_HEIGHT = 3840;
 
-/** 
- * Takes an image as a base64 encoded string and a string that is either 'mb' (for mebibyte) or 
- * 'kb' (for kibibyte) and returns an object containing the unit used and the size of the image.
+/**
+ * Takes an image as a base64 encoded string and a string that is either 'mb' or
+ * 'kb' and returns an object containing the unit used and the size of the image.
  */
 const getImageSize = (image: string, unit: 'mb' | 'kb' = 'mb') => {
   const sizeInBytes = (image.length * 3) / 4 - 2;
@@ -37,7 +37,7 @@ const imageSizeLabel = (image: string) => {
 };
 
 const onFileChange = (e: Event) => {
-  const handleEncodedImages = (encodedImages: string[]) => {    
+  const handleEncodedImages = (encodedImages: string[]) => {
     const compliantImages = encodedImages.filter(img => getImageSize(img).value <= MAX_MB_ALLOWANCE);
     if (compliantImages.length !== encodedImages.length) {
       if (compliantImages.length !== 0) {
@@ -50,7 +50,7 @@ const onFileChange = (e: Event) => {
     }
     emits('update:modelValue', [...compliantImages, ...props.modelValue]);
   };
-  
+
   const handleEncodedImagesError = (error: unknown) => {
     console.warn('cannot encode images')
     console.error('Error encoding images:', error);
@@ -67,10 +67,14 @@ const onFileChange = (e: Event) => {
   if (!files) return;
 
   const images = Array.from(files);
-  Promise.all(images.map(img => 
+  Promise.all(images.map(img =>
     uploadImageFilePipeline(img, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
-  )).then(imgs => { handleEncodedImages(imgs); isWorking.value = false })
-    .catch(handleEncodedImagesError);
+  ))
+  .then(imgs => {
+    handleEncodedImages(imgs)
+    isWorking.value = false
+  })
+  .catch(handleEncodedImagesError);
 };
 
 const removeImage = (image: string) => {
