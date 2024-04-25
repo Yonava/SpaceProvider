@@ -36,45 +36,20 @@ const imageSizeLabel = (image: string) => {
   return `${size.value.toFixed(1)} ${size.unit.toUpperCase()}`;
 };
 
-const onFileChange = (e: Event) => {
-  const handleEncodedImages = (encodedImages: string[]) => {
-    const compliantImages = encodedImages.filter(img => getImageSize(img).value <= MAX_MB_ALLOWANCE);
-    if (compliantImages.length !== encodedImages.length) {
-      if (compliantImages.length !== 0) {
-        console.warn(`some images exceed ${MAX_MB_ALLOWANCE}MB limit and have been discarded`);
-        fileUploadError.value = `Some images exceed ${MAX_MB_ALLOWANCE}MB limit and have been discarded`;
-      } else {
-        console.warn(`images exceed ${MAX_MB_ALLOWANCE}MB limit and have been discarded`);
-        fileUploadError.value = `Upload exceeds ${MAX_MB_ALLOWANCE}MB limit and has been discarded`;
-      }
-    }
-    emits('update:modelValue', [...compliantImages, ...props.modelValue]);
-  };
-
-  const handleEncodedImagesError = (error: unknown) => {
-    console.warn('cannot encode images')
-    console.error('Error encoding images:', error);
-    if (error instanceof Error) {
-      fileUploadError.value = error.message;
-    } else {
-      fileUploadError.value = 'Error encoding images';
-    }
-  };
-
+const onFileChange = async (e: Event) => {
   isWorking.value = true;
   fileUploadError.value = null;
-  const files = (e.target as HTMLInputElement).files;
+  const { files } = e.target as HTMLInputElement;
   if (!files) return;
-
-  const images = Array.from(files);
-  Promise.all(images.map(img =>
-    uploadImageFilePipeline(img, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
-  ))
-  .then(imgs => {
-    handleEncodedImages(imgs)
-    isWorking.value = false
-  })
-  .catch(handleEncodedImagesError);
+  const [ image ] = Array.from(files);
+  if (!image) return;
+  try {
+    const base64Img = await uploadImageFilePipeline(image, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
+    emits('update:modelValue', [...props.modelValue, base64Img])
+  } catch (error) {
+    fileUploadError.value = error instanceof Error ? error.message : 'Error encoding image';
+  }
+  isWorking.value = false;
 };
 
 const removeImage = (image: string) => {
@@ -144,10 +119,10 @@ const removeImage = (image: string) => {
       No images uploaded
     </h1>
     <h1
-      v-if="isWorking && !fileUploadError"
+      v-else-if="isWorking"
       class="py-2 text-blue"
     >
-      Encoding image(s)...
+      Encoding image...
     </h1>
   </div>
 </template>
