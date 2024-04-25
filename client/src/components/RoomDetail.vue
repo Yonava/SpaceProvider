@@ -1,13 +1,14 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Room">
 import { buildings, labels } from '../rooms';
-import type { PostedRoom } from '../rooms';
+import type { PostedRoom, Room } from '../rooms';
 import { getCoords } from '../location';
 import ImageUpload from './ImageUpload.vue';
 
 const capacities = Array.from({ length: 30 }, (_, i) => (i + 1) * 10);
 
 const props = defineProps<{
-  room: PostedRoom;
+  room: PostedRoom<T>;
+  loading: boolean;
 }>();
 
 const getLiveGPS = async () => {
@@ -17,11 +18,19 @@ const getLiveGPS = async () => {
 
 <template>
   <div style="padding-bottom: 300px">
+
+    <v-progress-linear
+      v-if="loading"
+      color="primary"
+      indeterminate
+    />
+
     <h1 class="mb-3">
       Edit Room
     </h1>
+
     <div class="d-flex" style="gap: 20px;">
-      <v-select
+      <v-autocomplete
         :items="buildings"
         v-model="props.room.building"
         label="Building"

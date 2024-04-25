@@ -7,9 +7,7 @@ const DevURI = 'http://localhost:3000/admin/api/'
 const URI = location.hostname === 'localhost' ? DevURI : ProdURI
 
 const getRooms = async () => {
-  console.log(URI)
   const { data } = await axios.get<PostedRoom[]>(URI)
-  console.log(data)
   return data
 }
 

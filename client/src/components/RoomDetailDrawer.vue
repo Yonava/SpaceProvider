@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useRooms } from '../stores/rooms';
 import RoomDetail from './RoomDetail.vue';
 
-const { currentRoom } = storeToRefs(useRooms());
+const { currentRoom, loadingInLatestRoomData } = storeToRefs(useRooms());
 const { saveRoom, setCurrentRoom } = useRooms();
 
 const drawer = computed({
@@ -45,7 +45,10 @@ const closeDrawer = () => {
       v-if="currentRoom"
       class="pa-4"
     >
-      <RoomDetail :room="currentRoom" />
+      <RoomDetail
+        :room="currentRoom"
+        :loading="loadingInLatestRoomData"
+      />
     </div>
     <div v-else>
       <h1>

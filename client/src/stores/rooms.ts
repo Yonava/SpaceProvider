@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
-import { getRooms, postRoom, updateRoom, deleteRoom } from '../api'
+import { getRooms, getRoom, postRoom, updateRoom, deleteRoom } from '../api'
 import type { Room, PostedRoom } from '../rooms'
 import { serializeRoom } from '../rooms'
 import { search } from '../search'
@@ -11,10 +11,26 @@ export const useRooms = defineStore('rooms', () => {
   const loadingRooms = ref(false)
   const currentRoom = ref<PostedRoom | null>(null)
   const serializedCurrentRoom = ref('')
+  const loadingInLatestRoomData = ref(false)
 
-  const setCurrentRoom = (room: PostedRoom | null) => {
-    if (room) serializedCurrentRoom.value = serializeRoom(room)
+  const setCurrentRoom = async (room: PostedRoom | null) => {
+    if (!room) {
+      currentRoom.value = null
+      serializedCurrentRoom.value = ''
+      return
+    }
+
     currentRoom.value = room
+
+    loadingInLatestRoomData.value = true
+    try {
+      const latestDataForRoom = await getRoom(room._id)
+      Object.assign(room, latestDataForRoom)
+    } catch {
+      console.error('failed to fetch latest room data')
+    }
+    serializedCurrentRoom.value = serializeRoom(room)
+    loadingInLatestRoomData.value = false
   }
 
   const filterQuery = ref('')
@@ -84,6 +100,7 @@ export const useRooms = defineStore('rooms', () => {
     saveRoom,
     removeRoom,
     fetchRooms,
-    loadingRooms
+    loadingRooms,
+    loadingInLatestRoomData
   }
 })
