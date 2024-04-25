@@ -10,9 +10,14 @@ const Room = require('../schemas/rooms');
 router.get('/', async (req, res) => {
   console.log('GET /rooms');
   try {
-    const rooms = await Room.find();
+    const roomsWithoutImages = await Room.find({}, '-images');
+    const rooms = roomsWithoutImages.map(room => ({
+      ...room._doc,
+      images: []
+    }));
     res.json(rooms);
   } catch (error) {
+    console.log('Error getting rooms', error);
     res.status(500).json({
       message: 'Error getting rooms'
     });
