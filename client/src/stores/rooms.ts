@@ -22,15 +22,18 @@ export const useRooms = defineStore('rooms', () => {
 
     currentRoom.value = room
 
-    loadingInLatestRoomData.value = true
-    try {
-      const latestDataForRoom = await getRoom(room._id)
-      Object.assign(room, latestDataForRoom)
-    } catch {
-      console.error('failed to fetch latest room data')
+    if (room.images.length === 0) {
+      loadingInLatestRoomData.value = true
+      try {
+        const latestDataForRoom = await getRoom(room._id)
+        Object.assign(room, latestDataForRoom)
+      } catch {
+        console.error('failed to fetch latest room data')
+      }
+      loadingInLatestRoomData.value = false
     }
+
     serializedCurrentRoom.value = serializeRoom(room)
-    loadingInLatestRoomData.value = false
   }
 
   const filterQuery = ref('')

@@ -59,6 +59,7 @@ const removeImage = (image: string) => {
 
 <template>
   <div>
+
     <v-btn
       @click.stop="fileInput!.click()"
       color="primary"
