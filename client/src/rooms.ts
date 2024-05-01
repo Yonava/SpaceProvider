@@ -20,7 +20,7 @@ export const buildings = [
   "TOBN", // Tobin Hall
   "THOM", // Thompson Hall
   "THCH", // Thatcher House
-  "STUN", // Student Union
+  "STUDENTUN", // Student Union
   "STK", // Stockbridge Hall
   "SOM", // School of Management
   "SKIN", // Skinner Hall
