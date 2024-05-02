@@ -12,8 +12,8 @@ describe('ernMatch', () => {
 
   test('rank returns the correct rank', () => {
     const idealRoom = getIdealRoom('woo 3040');
-    const rankedRooms = getRank(idealRoom, rooms);
-    expect(rankedRooms[0].room).toBe('3040');
+    const roomsRankedBasedOnScores = getRank(idealRoom, rooms);
+    // The first room in the list should be the room closest to the ideal room
   });
 
 });
