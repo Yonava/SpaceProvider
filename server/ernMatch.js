@@ -17,7 +17,7 @@ const score = (optimalRoom, givenRoom) => {
  * @description Ranks rooms based on how well they match an optimal room
  * @param {OptimalRoom} optimalRoom - the ideal room to match against. Contains building, room, and labels
  * @param {Object[]} rooms - the rooms to rank
- * @returns {{ room: Room, rank: number }[]} - the ranked rooms, sorted by rank in descending order
+ * @returns {{ room: Room, score: number }[]} - the ranked rooms, sorted by rank in descending order
  */
 const rank = (optimalRoom, rooms) => {
   // TODO

@@ -1,13 +1,5 @@
 /**
  * @module queryStringParser
- * @description Parses a raw query string into an "ideal room" object
- * @param {string} rawQuery - the raw query string to parse
- * @returns {Object} - an object representing the ideal room
- * @returns {string[]} [labels] - an array of labels
- * @returns {string} [building] - the building code
- * @returns {string} [room] - the room code
- * @example
- * const parseQueryString = require('./queryStringParser')
  */
 
 /**
@@ -54,9 +46,13 @@ const parseBuildingRoomString = (rawQuery) => {
 }
 
 /**
- * Parses a raw query string into an "ideal room" object
+ * @description Parses a raw query string into an "ideal room" object
  * @param {string} rawQuery - the raw query string to parse
- * @returns {Object} - an object representing the ideal room
+ * @returns {Object} an object representing the ideal room
+ * @returns {string[]} [labels] - an array of labels
+ * @returns {string} [building] - the building code
+ * @returns {string} [room] - the room code
+ * @example parseQueryString('woo 3040') // { building: 'woo', room: '3040' }
 */
 const parseQueryString = (rawQuery) => {
   const tokens = rawQuery
