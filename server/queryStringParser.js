@@ -1,4 +1,21 @@
+/**
+ * @module queryStringParser
+ * @description Parses a raw query string into an "ideal room" object
+ * @param {string} rawQuery - the raw query string to parse
+ * @returns {Object} - an object representing the ideal room
+ * @returns {string[]} [labels] - an array of labels
+ * @returns {string} [building] - the building code
+ * @returns {string} [room] - the room code
+ * @example
+ * const parseQueryString = require('./queryStringParser')
+ */
 
+/**
+ * @description Replaces all non-alphanumeric characters in a string with spaces
+ * @param {string} str - the string to replace characters in
+ * @returns {string} - the string with non-alphanumeric characters replaced with spaces
+ * @example replaceNonAlphaNumWithSpace('woo-3040') // 'woo 3040'
+*/
 const replaceNonAlphaNumWithSpace = (str) => str.replace(/[^a-zA-Z0-9]/g, ' ');
 
 /**
