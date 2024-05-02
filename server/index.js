@@ -18,7 +18,7 @@ const { MONGO_URI } = process.env;
 mongoose.connect(MONGO_URI);
 
 const rateLimiter = limitRequestRate({
-  requestLimit: 2,
+  requestLimit: 10,
   backoffDurationMs: 2000,
   paths: ['/api/v1'],
 })
