@@ -8,7 +8,6 @@ const router = express.Router();
 const Room = require('../schemas/rooms');
 
 router.get('/', async (req, res) => {
-  console.log('GET /rooms');
   try {
     const roomsWithoutImages = await Room.find({}, '-images');
     const rooms = roomsWithoutImages.map(room => ({

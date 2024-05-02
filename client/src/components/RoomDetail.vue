@@ -21,6 +21,7 @@ const getLiveGPS = async () => {
 
     <v-progress-linear
       v-if="loading"
+      class="px-2 my-2"
       color="primary"
       indeterminate
     />
