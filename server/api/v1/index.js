@@ -143,7 +143,9 @@ router.get('/', async (req, res) => {
       }
     }
 
-    batchGetOptions['gps_coords'] = geoLocationQuery;
+    console.log(geoLocationQuery)
+    // TODO fix geo query
+    // batchGetOptions['gps_coords'] = geoLocationQuery;
   }
 
   try {
