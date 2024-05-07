@@ -99,20 +99,21 @@ const getRoomCapacity = () => {
       Get Official Room Capacity
     </v-btn>
 
-    <b
-      v-if="officialCapacityFailed"
-      class="py-2 text-red"
-    >
-      No official room capacity found
-    </b>
-
-    <b
-      v-if="capacityUpdated"
-      class="py-2 text-blue"
-    >
-      Updated with official room capacity
-    </b>
-
+    <div>
+      <b
+        v-if="officialCapacityFailed"
+        class="py-2 text-red"
+      >
+        No official room capacity found
+      </b>
+      <b
+        v-if="capacityUpdated"
+        class="py-2 text-blue"
+      >
+        Updated with official room capacity
+      </b>
+    </div>
+    
     <div class="mt-5">
       <ImageUpload
         v-model="props.room.images"
