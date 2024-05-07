@@ -1,10 +1,13 @@
 <script setup lang="ts" generic="T extends Room">
+import { ref } from 'vue';
 import { buildings, labels } from '../rooms';
 import type { PostedRoom, Room } from '../rooms';
 import { getCoords } from '../location';
 import ImageUpload from './ImageUpload.vue';
+import { roomCapacities } from '../capacities';
 
 const capacities = Array.from({ length: 30 }, (_, i) => (i + 1) * 10);
+const officialCapacityFailed = ref(false);
 
 const props = defineProps<{
   room: PostedRoom<T>;
@@ -14,6 +17,17 @@ const props = defineProps<{
 const getLiveGPS = async () => {
   props.room.gps_coords.coordinates = await getCoords();
 };
+
+const getRoomCapacity = () => {
+  const buildingCode = props.room.building;
+  const roomCode = props.room.room;
+  if (buildingCode in roomCapacities && roomCode in roomCapacities[buildingCode]) {
+    props.room.capacity = roomCapacities[buildingCode][roomCode];
+    officialCapacityFailed.value = false;
+  } else {
+    officialCapacityFailed.value = true;
+  }
+}
 </script>
 
 <template>
@@ -74,6 +88,21 @@ const getLiveGPS = async () => {
         {{ capacity }}
       </v-btn>
     </div>
+
+    <v-btn
+      @click.stop="getRoomCapacity"
+      size="small"
+      color="primary"
+    >
+      Get Official Room Capacity
+    </v-btn>
+
+    <b
+      v-if="officialCapacityFailed"
+      class="py-2 text-red"
+    >
+      No official room capacity found
+    </b>
 
     <div class="mt-5">
       <ImageUpload
