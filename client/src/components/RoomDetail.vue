@@ -2,11 +2,12 @@
 import { ref } from 'vue';
 import { buildings, labels } from '../rooms';
 import type { PostedRoom, Room } from '../rooms';
+import { getOfficialCapacity } from '../capacities';
 import { getCoords } from '../location';
 import ImageUpload from './ImageUpload.vue';
-import { roomCapacities } from '../capacities';
 
 const capacities = Array.from({ length: 30 }, (_, i) => (i + 1) * 10);
+const capacityUpdated = ref(false);
 const officialCapacityFailed = ref(false);
 
 const props = defineProps<{
@@ -19,13 +20,14 @@ const getLiveGPS = async () => {
 };
 
 const getRoomCapacity = () => {
-  const buildingCode = props.room.building;
-  const roomCode = props.room.room;
-  if (buildingCode in roomCapacities && roomCode in roomCapacities[buildingCode]) {
-    props.room.capacity = roomCapacities[buildingCode][roomCode];
-    officialCapacityFailed.value = false;
-  } else {
+  const officialCapacity = getOfficialCapacity(props.room.building, props.room.room);
+  if (!officialCapacity) {
+    capacityUpdated.value = false;
     officialCapacityFailed.value = true;
+  } else {
+    props.room.capacity = officialCapacity;
+    capacityUpdated.value = true;
+    officialCapacityFailed.value = false;
   }
 }
 </script>
@@ -102,6 +104,13 @@ const getRoomCapacity = () => {
       class="py-2 text-red"
     >
       No official room capacity found
+    </b>
+
+    <b
+      v-if="capacityUpdated"
+      class="py-2 text-blue"
+    >
+      Updated with official room capacity
     </b>
 
     <div class="mt-5">
