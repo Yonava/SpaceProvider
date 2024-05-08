@@ -100,9 +100,10 @@ const updateAllCapacities = async() => {
     </div>
     
     <v-btn
-          @click.stop="updateAllCapacities"
-          color="blue"
-        >
+      @click.stop="updateAllCapacities"
+      color="blue"
+      class="my-2"
+    >
           Update All Room Capacities
     </v-btn>
 
