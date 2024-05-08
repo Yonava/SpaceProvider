@@ -5,6 +5,7 @@ import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
 import { newRoom } from '../rooms';
 import { getCoords, getDistanceInMeters } from '../location';
+import { getOfficialCapacity } from '../capacities';
 
 const { saveRoom, setCurrentRoom } = useRooms();
 const { filterQuery, displayedRooms, loadingRooms } = storeToRefs(useRooms());
@@ -39,6 +40,19 @@ const createRoom = async () => {
   }
   setCurrentRoom(postedRoom);
   addLoading.value = false;
+}
+
+const updateAllCapacities = async() => {
+  const { rooms } = useRooms();
+  for (const room of rooms.slice()) {
+    const offCapacity = getOfficialCapacity(room.building, room.room);
+    room.capacity = offCapacity ?? room.capacity;
+    const savedRoom = await saveRoom(room);
+    if (!savedRoom) {
+      console.warn('Failed to save room');
+      return;
+    }
+  }
 }
 </script>
 
@@ -80,6 +94,13 @@ const createRoom = async () => {
         </h5>
       </div>
     </div>
+    
+    <v-btn
+          @click.stop="updateAllCapacities"
+          color="blue"
+        >
+          Update All Room Capacities
+    </v-btn>
 
     <v-divider></v-divider>
 
