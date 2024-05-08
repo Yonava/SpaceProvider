@@ -1,10 +1,14 @@
 <script setup lang="ts" generic="T extends Room">
+import { ref } from 'vue';
 import { buildings, labels } from '../rooms';
 import type { PostedRoom, Room } from '../rooms';
+import { getOfficialCapacity } from '../capacities';
 import { getCoords } from '../location';
 import ImageUpload from './ImageUpload.vue';
 
 const capacities = Array.from({ length: 30 }, (_, i) => (i + 1) * 10);
+const capacityUpdated = ref(false);
+const officialCapacityFailed = ref(false);
 
 const props = defineProps<{
   room: PostedRoom<T>;
@@ -14,6 +18,13 @@ const props = defineProps<{
 const getLiveGPS = async () => {
   props.room.gps_coords.coordinates = await getCoords();
 };
+
+const getRoomCapacity = () => {
+  const officialCapacity = getOfficialCapacity(props.room.building, props.room.room);
+  if (officialCapacity) props.room.capacity = officialCapacity;
+  capacityUpdated.value = !!officialCapacity;
+  officialCapacityFailed.value = !officialCapacity;
+}
 </script>
 
 <template>
@@ -75,6 +86,29 @@ const getLiveGPS = async () => {
       </v-btn>
     </div>
 
+    <v-btn
+      @click.stop="getRoomCapacity"
+      size="small"
+      color="primary"
+    >
+      Get Official Room Capacity
+    </v-btn>
+
+    <div>
+      <b
+        v-if="officialCapacityFailed"
+        class="py-2 text-red"
+      >
+        No official room capacity found
+      </b>
+      <b
+        v-if="capacityUpdated"
+        class="py-2 text-blue"
+      >
+        Updated with official room capacity
+      </b>
+    </div>
+    
     <div class="mt-5">
       <ImageUpload
         v-model="props.room.images"
