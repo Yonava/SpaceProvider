@@ -56,7 +56,7 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { body } = req;
   try {
-    const room = await Room.findByIdAndUpdate(id, body, {
+    const room = await Room.findByIdAndUpdate(id, { $set: body }, {
       new: true
     });
     res.json(room);

@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { uploadImageFilePipeline } from '../images';
+import { storeToRefs } from 'pinia';
+import { useRooms } from '../stores/rooms';
+
+const { currentRoom } = storeToRefs(useRooms());
+const { saveRoom } = useRooms();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const fileUploadError = ref<string | null>(null);
 const isWorking = ref<boolean>(false);
+const actionStatus = ref<string | null>(null);
 
 const props = defineProps<{
   modelValue: string[];
@@ -16,6 +22,14 @@ const emits = defineEmits<{
 
 const MAX_MB_ALLOWANCE = 2;
 const MAX_WIDTH_OR_HEIGHT = 3840;
+
+const saveImages = async () => {
+  if (!currentRoom.value) {
+    console.log('No current room to save');
+    return;
+  }
+  await saveRoom(currentRoom.value, true);
+}
 
 /**
  * Takes an image as a base64 encoded string and a string that is either 'mb' or
@@ -46,14 +60,20 @@ const onFileChange = async (e: Event) => {
   try {
     const base64Img = await uploadImageFilePipeline(image, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
     emits('update:modelValue', [...props.modelValue, base64Img])
+    actionStatus.value = `Saving image...`
+    await saveImages();
+    actionStatus.value = `Image saved.`
   } catch (error) {
     fileUploadError.value = error instanceof Error ? error.message : 'Error encoding image';
   }
   isWorking.value = false;
 };
 
-const removeImage = (image: string) => {
+const removeImage = async (image: string) => {
   emits('update:modelValue', props.modelValue.filter((img) => img !== image));
+  actionStatus.value = `Deleting image...`
+  await saveImages();
+  actionStatus.value = `Image deleted.`
 };
 </script>
 
@@ -67,6 +87,13 @@ const removeImage = (image: string) => {
     >
       Upload Image
     </v-btn>
+
+    <b
+      v-if="actionStatus"
+      class="text-blue px-2"
+    >
+      {{ actionStatus }}
+    </b>
 
     <p
       v-if="fileUploadError"

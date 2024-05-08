@@ -22,6 +22,12 @@ const postRoom = async <T extends Room>(room: T) => {
 }
 
 const updateRoom = async <T extends PostedRoom>(room: T) => {
+  const { images, ...roomNoImages } = room;
+  const { data } = await axios.put<T>(`${URI}${room._id}`, roomNoImages)
+  return data
+}
+
+const updateRoomWithImages = async <T extends PostedRoom>(room: T) => {
   const { data } = await axios.put<T>(`${URI}${room._id}`, room)
   return data
 }
@@ -36,5 +42,6 @@ export {
   getRoom,
   postRoom,
   updateRoom,
+  updateRoomWithImages,
   deleteRoom
 }
