@@ -21,14 +21,9 @@ const getLiveGPS = async () => {
 
 const getRoomCapacity = () => {
   const officialCapacity = getOfficialCapacity(props.room.building, props.room.room);
-  if (!officialCapacity) {
-    capacityUpdated.value = false;
-    officialCapacityFailed.value = true;
-  } else {
-    props.room.capacity = officialCapacity;
-    capacityUpdated.value = true;
-    officialCapacityFailed.value = false;
-  }
+  if (officialCapacity) props.room.capacity = officialCapacity;
+  capacityUpdated.value = !!officialCapacity;
+  officialCapacityFailed.value = !officialCapacity;
 }
 </script>
 

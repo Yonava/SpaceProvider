@@ -2,20 +2,13 @@
  * Gets the room capacity given the building and room, as long as it is contained in the data.
  * @param buildingCode string
  * @param roomCode string
- * @returns room capacity given the building and room are contained in data, null otherwise
+ * @returns room capacity given the building and room are contained in data, undefined otherwise
  */
-export const getOfficialCapacity = (buildingCode: string, roomCode: string): number | null => {
-  if (buildingCode in roomCapacities && roomCode in roomCapacities[buildingCode]) {
-    return roomCapacities[buildingCode][roomCode];
-  }
-  return null;
+export const getOfficialCapacity = (buildingCode: string, roomCode: string) => {
+  return roomCapacities?.[buildingCode]?.[roomCode]
 };
 
-type RoomCapacities = {
-  [buildingCode: string]: {
-    [roomCode: string]: number;
-  };
-};
+type RoomCapacities = Record<string, Record<string, number>>
 
 const roomCapacities: RoomCapacities = {
   "MAH": {
