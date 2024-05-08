@@ -44,9 +44,13 @@ const createRoom = async () => {
 
 const updateAllCapacities = async() => {
   const { rooms } = useRooms();
-  for (const room of rooms.slice()) {
-    const offCapacity = getOfficialCapacity(room.building, room.room);
-    room.capacity = offCapacity ?? room.capacity;
+  for (const room of rooms) {
+    const officialCapacity = getOfficialCapacity(room.building, room.room);
+    if (officialCapacity == room.capacity) {
+      console.log('room capacity already up to date');
+      continue;
+    }
+    room.capacity = officialCapacity ?? room.capacity;
     const savedRoom = await saveRoom(room);
     if (!savedRoom) {
       console.warn('Failed to save room');
