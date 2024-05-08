@@ -59,14 +59,16 @@ const onFileChange = async (e: Event) => {
   if (!image) return;
   try {
     const base64Img = await uploadImageFilePipeline(image, MAX_MB_ALLOWANCE, MAX_WIDTH_OR_HEIGHT)
+    isWorking.value = false;
     emits('update:modelValue', [...props.modelValue, base64Img])
     actionStatus.value = `Saving image...`
     await saveImages();
     actionStatus.value = `Image saved.`
   } catch (error) {
     fileUploadError.value = error instanceof Error ? error.message : 'Error encoding image';
+    actionStatus.value = null;
+    isWorking.value = false;
   }
-  isWorking.value = false;
 };
 
 const removeImage = async (image: string) => {
