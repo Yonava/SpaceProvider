@@ -183,7 +183,10 @@ router.get('/', async (req, res) => {
     res.json({
       page,
       options,
-      rooms: rooms
+      rooms: rooms.map(room => ({
+        ...room._doc,
+        images: []
+      }))
     });
   } catch (error) {
     console.error('error', error);
