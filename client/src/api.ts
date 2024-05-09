@@ -21,15 +21,15 @@ const postRoom = async <T extends Room>(room: T) => {
   return data
 }
 
-const updateRoom = async <T extends PostedRoom>(room: T) => {
-  const { images, ...roomNoImages } = room;
-  const { data } = await axios.put<T>(`${URI}${room._id}`, roomNoImages)
-  return data
-}
-
-const updateRoomWithImages = async <T extends PostedRoom>(room: T) => {
-  const { data } = await axios.put<T>(`${URI}${room._id}`, room)
-  return data
+const updateRoom = async <T extends PostedRoom>(room: T, excludeImages: boolean = true) => {
+  if (excludeImages) {
+    const { images, ...roomNoImages } = room
+    const { data } = await axios.put<T>(`${URI}${room._id}`, roomNoImages)
+    return data
+  } else {
+    const { data } = await axios.put<T>(`${URI}${room._id}`, room)
+    return data
+  }
 }
 
 const deleteRoom = async (_id: string) => {
@@ -42,6 +42,5 @@ export {
   getRoom,
   postRoom,
   updateRoom,
-  updateRoomWithImages,
   deleteRoom
 }

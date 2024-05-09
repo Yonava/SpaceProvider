@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, onMounted } from 'vue'
-import { getRooms, getRoom, postRoom, updateRoom, updateRoomWithImages, deleteRoom } from '../api'
+import { getRooms, getRoom, postRoom, updateRoom, deleteRoom } from '../api'
 import type { Room, PostedRoom } from '../rooms'
 import { serializeRoom } from '../rooms'
 import { search } from '../search'
@@ -45,7 +45,7 @@ export const useRooms = defineStore('rooms', () => {
     loadingRooms.value = false
   }
 
-  const saveRoom = async (room: Room | PostedRoom, images: boolean = false) => {
+  const saveRoom = async (room: Room | PostedRoom, excludeImages: boolean = true) => {
 
     const currentRoomEdited = serializeRoom(room) !== serializedCurrentRoom.value
     if (!currentRoomEdited) {
@@ -57,7 +57,7 @@ export const useRooms = defineStore('rooms', () => {
 
     if ('_id' in room) {
       try {
-        return images ? await updateRoomWithImages(room) : await updateRoom(room)
+        return await updateRoom(room, excludeImages)
       } catch (err) {
         console.log('failed to update')
         console.error(err)

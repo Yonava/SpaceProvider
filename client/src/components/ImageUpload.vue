@@ -28,7 +28,7 @@ const saveImages = async () => {
     console.log('No current room to save');
     return;
   }
-  await saveRoom(currentRoom.value, true);
+  await saveRoom(currentRoom.value, false);
 }
 
 /**
