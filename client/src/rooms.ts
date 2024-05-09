@@ -27,8 +27,8 @@ export const buildings = [
   "SC", // South College
   "SAB", // Studio Arts Building
   "REG", // Research & Educ Greenhouse
-  "RANDUPPR", // Rand Upper Lobby 
-  "RANDSTAGE", // Rand Stage 
+  "RANDUPPR", // Rand Upper Lobby
+  "RANDSTAGE", // Rand Stage
   "PAIG", // Paige Laboratory
   "NAH", // New Africa House
   "MRST", // Marston Hall
@@ -39,7 +39,7 @@ export const buildings = [
   "MOR", // Morrill
   "MONT", // Montague House
   "MELV", // Melville Hall
-  "MARC", // Marcus Hall  
+  "MARC", // Marcus Hall
   "MAH", // Mahar Auditorium
   "MACH", // Machmer Hall
   "LYON", // Mary Lyon House
@@ -56,7 +56,7 @@ export const buildings = [
   "HAS", // Hasbrouck Laboratory
   "GUN", // Gunness Hall
   "GSMN", // Goessmann Hall addn.
-  "GP", // George Parks Bldg 
+  "GP", // George Parks Bldg
   "GORM", // Gorman House
   "GORDNHALL", // Gordon Hall
   "GOES", // Goessmann Hal
@@ -101,12 +101,12 @@ export type GPSData = {
   coordinates: GPSCoord
 }
 
-
 export type Room = {
   building: Building,
   room: string,
   access_notes: string,
   images: string[],
+  thumbnail: string,
   gps_coords: GPSData,
   labels: RoomLabel[],
   capacity: number,
@@ -120,6 +120,7 @@ export const newRoom = (building: Building): Room => ({
   room: '',
   access_notes: '',
   images: [],
+  thumbnail: '',
   gps_coords: {
     type: 'Point',
     coordinates: [0, 0]

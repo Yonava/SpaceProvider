@@ -17,7 +17,7 @@ const router = express.Router();
  * @property {number} page - the page of results to get. One indexed
  */
 const PAGINATION_DEFAULTS = {
-  limit: 20,
+  limit: 1,
   page: 1,
 }
 
@@ -35,6 +35,8 @@ const PAGINATION_DEFAULTS = {
 router.get('/', async (req, res) => {
 
   const sendError = respondWithError(res);
+
+  console.log('started get request')
 
   // if the query has a room parameter, return room with corresponding building-room combination
   if (req.query.room) {
@@ -149,10 +151,15 @@ router.get('/', async (req, res) => {
   }
 
   try {
+
+    console.log('requesting rooms')
+
     const rooms = await Room
-      .find(batchGetOptions, { images: { $slice: 1 } })
+      .find(batchGetOptions, '-images')
       .limit(limitNum)
-      .skip(limitNum * (pageNum - 1));
+      .skip((pageNum - 1) * limitNum);
+
+    console.log('request complete')
 
     const total_results = await Room.countDocuments(batchGetOptions);
     const total_pages = Math.ceil(total_results / limitNum);
@@ -176,7 +183,10 @@ router.get('/', async (req, res) => {
     res.json({
       page,
       options,
-      rooms
+      rooms: rooms.map(room => ({
+        ...room._doc,
+        images: []
+      }))
     });
   } catch (error) {
     console.error('error', error);
