@@ -15,8 +15,11 @@
     "paths": {
       "@store/*": ["./src/store/*"],
       "@components/*": ["./src/components"],
-    }
+    },
+    "types": [
+      "jest",
+    ],
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "**/*.test.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
