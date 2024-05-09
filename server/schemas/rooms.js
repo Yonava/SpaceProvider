@@ -13,6 +13,7 @@ const room = Schema({
   room: String,
   access_notes: String,
   images: [String],
+  thumbnail: String,
   gps_coords: {
     type: { type: String, default: 'Point' }, // GeoJSON type
     coordinates: { type: [Number], default: [0, 0] } // Longitude (lon), Latitude (lat)
