@@ -5,7 +5,6 @@ import RoomList from './RoomList.vue';
 import { useRooms } from '../stores/rooms';
 import { newRoom } from '../rooms';
 import { getCoords, getDistanceInMeters } from '../location';
-//import { getOfficialCapacity } from '../capacities';
 
 const { saveRoom, setCurrentRoom } = useRooms();
 const { filterQuery, displayedRooms, loadingRooms } = storeToRefs(useRooms());
@@ -81,7 +80,7 @@ const createRoom = async () => {
         </h5>
       </div>
     </div>
-    
+
     <v-divider></v-divider>
 
     <div
