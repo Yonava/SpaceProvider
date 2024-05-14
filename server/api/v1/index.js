@@ -152,7 +152,7 @@ router.get('/', async (req, res) => {
     }
 
     const getProjection = {
-      //FIXME images: { $slice: 1 } 
+      images: 0,//FIXME images: { $slice: 1 } 
     }
 
     // get initial batch of rooms (not ranked by query, without images)
