@@ -2,14 +2,9 @@
  * @module queryStringParser
  */
 
-/**
- * @description Replaces all non-alphanumeric characters in a string with spaces
- * @param {string} str - the string to replace characters in
- * @returns {string} - the string with non-alphanumeric characters replaced with spaces
- * @example replaceNonAlphaNumWithSpace('woo-3040') // 'woo 3040'
-*/
-const replaceNonAlphaNumWithSpace = (str) => str.replace(/[^a-zA-Z0-9]/g, ' ');
+const NON_APLHA_NUM = /[^a-zA-Z0-9]/g;
 
+//parseBuildingRoomString unused
 /**
  * Parses a raw query string into a building and room
  * @param {string} rawQuery - the raw query string to parse
@@ -20,7 +15,7 @@ const replaceNonAlphaNumWithSpace = (str) => str.replace(/[^a-zA-Z0-9]/g, ' ');
 const parseBuildingRoomString = (rawQuery) => {
   const tokens = rawQuery.split(' ')
 
-  let roomBuildingTokens = tokens.map(token => replaceNonAlphaNumWithSpace(token).trim())
+  let roomBuildingTokens = tokens.map(token => token.replace(NON_APLHA_NUM, ' ').trim())
   if (roomBuildingTokens.length === 1) roomBuildingTokens = roomBuildingTokens[0].split(' ')
   roomBuildingTokens = roomBuildingTokens.filter(token => token.length > 0);
 
@@ -55,24 +50,22 @@ const parseBuildingRoomString = (rawQuery) => {
  * @example parseQueryString('woo 3040') // { building: 'woo', room: '3040' }
 */
 const parseQueryString = (rawQuery) => {
-  const tokens = rawQuery
-    .trim()
-    .split(' ')
+  const query = rawQuery.trim()
+  if (query.length === 0) return {};
+  const tokens = query.split(' ')
 
   const labelTokenPrefix = 'label:';
   const labelTokens = tokens.filter(token => token.startsWith(labelTokenPrefix));
   const labels = labelTokens.map(token => token.slice(labelTokenPrefix.length));
 
-  const roomBuildingTokens = tokens.filter(token => !token.startsWith(labelTokenPrefix));
-  const roomBuildingString = roomBuildingTokens.join(' ');
-  const { building, room } = parseBuildingRoomString(roomBuildingString);
+  const tokenizedQuery = tokens.filter(token => !token.startsWith(labelTokenPrefix))
+    .map(token => token.replace(NON_APLHA_NUM, '').toLowerCase()); // remove all non-alphanumeric characters and make lower case
+    
+  let roomQuery = {}
+  roomQuery.labels = Array.from(new Set(labels));
+  if (tokenizedQuery.length > 0) roomQuery.tokens = tokenizedQuery;
 
-  let idealRoom = {}
-  if (labels.length > 0) idealRoom.labels = Array.from(new Set(labels));
-  if (building) idealRoom.building = building;
-  if (room) idealRoom.room = room;
-
-  return idealRoom;
+  return roomQuery;
 }
 
 module.exports = parseQueryString;
