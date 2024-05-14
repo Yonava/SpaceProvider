@@ -10,6 +10,8 @@ const express = require('express');
 const { ERRORS, respondWithError } = require('../../constants');
 const Room = require('../../schemas/rooms');
 const router = express.Router();
+const parseQueryString = require('../../queryStringParser');
+const { rank } = require('../../ernMatch');
 
 /**
  * Default pagination options for batch get requests
@@ -103,17 +105,6 @@ router.get('/', async (req, res) => {
 
   const batchGetOptions = {};
 
-  // if query parameter is provided, we run a search on the database for best matches
-  // TODO needs improvement for better search results!
-  if (req.query.q) {
-    const { q } = req.query;
-    const query = q.split(' ').map((word) => new RegExp(word, 'i'));
-    const searchableFields = ['building', 'room'];
-    batchGetOptions['$or'] = searchableFields.map((field) => ({
-      [field]: { $in: query }
-    }));
-  }
-
   // if location parameters are provided, return rooms will be sorted by distance
   // lat cannot be provided without lon and vice versa
   if (req.query.lat || req.query.lon) {
@@ -151,13 +142,31 @@ router.get('/', async (req, res) => {
   }
 
   try {
-
     console.log('requesting rooms')
 
-    const rooms = await Room
-      .find(batchGetOptions, '-images')
-      .limit(limitNum)
-      .skip((pageNum - 1) * limitNum);
+    const searchProjection = {
+      _id: 1,
+      building: 1,
+      room: 1,
+      labels: 1
+    }
+
+    const getProjection = {
+      images: 0,//FIXME images: { $slice: 1 } 
+    }
+
+    // get initial batch of rooms (not ranked by query, without images)
+    let rooms = await Room.find(batchGetOptions, searchProjection);
+    if (req.query.q) { // if query parameter is provided, we run a search on the database for best matches
+      const { q } = req.query;
+      const roomQuery = parseQueryString(q);
+      rooms = rank(roomQuery, rooms);
+    }
+    const skip = (pageNum - 1) * limitNum;
+    // get found full room documents (only first image returned)
+    rooms = await Promise.all(
+      rooms.slice(skip, skip+limitNum).map(r => Room.findById(r._id, getProjection))
+    );
 
     console.log('request complete')
 
@@ -183,7 +192,7 @@ router.get('/', async (req, res) => {
     res.json({
       page,
       options,
-      rooms: rooms.map(room => ({
+      rooms: rooms.map(room => ({ //FIXME
         ...room._doc,
         images: []
       }))
