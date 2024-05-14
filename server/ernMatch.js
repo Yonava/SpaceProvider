@@ -1,32 +1,48 @@
 // for reference:
-// type OptimalRoom = { building?: string, room?: string, labels?: string[] }
+// type RoomQuery = { tokens?: string[], labels?: string[] }
 
-// TODO: Map from building names to building aliases
-const buildingAliases = undefined
+const buildingAliases = require('./building-aliases');
 
 /**
- * @description Scores a given room based on how well it matches an optimal room
- * @param {OptimalRoom} optimalRoom - the ideal room to match against. Ma building, room, and labels
- * @param {Object} givenRoom - contains a superset of fields from optimalRoom
+ * @description Scores a given room based on how well it matches the query.
+ * @param {roomQuery} roomQuery - the ideal room to match against. Ma building, room, and labels
+ * @param {Object} givenRoom - contains a superset of fields from roomQuery
  * @returns {number} - the "match" score of the given room. 0 is no match, 1 is a perfect match
  */
-const score = (optimalRoom, givenRoom) => {
-  const buildingScore = optimalRoom.building === undefined 
-    ? 1 
-    : 1 - levenshtein(optimalRoom.building, givenRoom.building)/Math.max(optimalRoom.building.length, givenRoom.building.length)
-  const roomScore = optimalRoom.room === undefined 
-    ? 1 
-    : 1 // TODO
-  return includesAll(optimalRoom.labels, givenRoom.labels) 
-    ? (buildingScore + roomScore)/2 
+const score = (roomQuery, givenRoom) => {
+  let buildingScore = 1;
+  let roomScore = 1;
+  if (roomQuery.tokens !== undefined) {
+    // compute sum of maximum levenshtein scores matched against aliases for givenRoom's building
+    // (normalized by number of tokens to keep below 1)
+    buildingScore = roomQuery.tokens.reduce((total, tok) => {
+      const tokenLevScores = buildingAliases[givenRoom.building].map((alias) => 
+        levScore(tok, alias));
+      return total + Math.max(...tokenLevScores);
+    }, 0) / roomQuery.tokens.length;
+    
+    // compute maximum levenshtein score matched against givenRoom's room
+    roomScore = Math.max(
+      ...roomQuery.tokens.map((tok) => levScore(tok, givenRoom.room.toLowerCase()))
+    );
+  }
+  // if givenRoom doesn't include all labels in roomQuery, score is 0
+  return includesAll(roomQuery.labels, givenRoom.labels) 
+    ? (buildingScore + roomScore)/2
     : 0
 }
 
-const includesAll = (arr1, arr2) => {
-  for(let i = 0; i <= arr1.length; i++){
-    if (!arr2.includes(arr1[i])) { return false; }
+// Returns true if all queryLabels are in givenRoomLabels, false otherwise
+const includesAll = (queryLabels, givenRoomLabels) => {
+  for (let i = 0; i < queryLabels.length; i++){
+    if (!givenRoomLabels.includes(queryLabels[i])) { return false; }
   }
   return true;
+}
+
+// Gets a score based on levenshtein distance
+const levScore = (s1, s2) => {
+  return 1 - (levenshtein(s1, s2)/Math.max(s1.length, s2.length));
 }
 
 /**
@@ -36,6 +52,7 @@ const includesAll = (arr1, arr2) => {
  * @returns number
  */
 const levenshtein = (s1, s2) => {
+  if (s1.length === 0 && s2.length === 0) return 0;
   if (s1.length === 0) return s2.length;
   if (s2.length === 0) return s1.length;
   const arr = [Array(s1.length), Array(s1.length)];
@@ -69,13 +86,13 @@ const scoreSort = (f, arr) => {
 }
 
 /**
- * @description Ranks rooms based on how well they match an optimal room
- * @param {OptimalRoom} optimalRoom - the ideal room to match against. Contains building, room, and labels
+ * @description Ranks rooms based on how well they match an room query
+ * @param {roomQuery} roomQuery - the query to match against. Contains query tokens and labels
  * @param {Object[]} rooms - the rooms to rank
  * @returns {{ room: Room, score: number }[]} - the ranked rooms, sorted by rank in descending order
  */
-const rank = (optimalRoom, rooms) => {
-  return scoreSort((x => score(optimalRoom, x)), rooms)
+const rank = (roomQuery, rooms) => {
+  return scoreSort((x => score(roomQuery, x)), rooms)
 }
 
 module.exports = { score, rank };
