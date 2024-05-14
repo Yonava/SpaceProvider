@@ -112,6 +112,7 @@ const getRoomCapacity = () => {
     <div class="mt-5">
       <ImageUpload
         v-model="props.room.images"
+        v-model:thumbnail="props.room.thumbnail"
       />
     </div>
 
