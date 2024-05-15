@@ -132,12 +132,12 @@ const getRoomCapacity = () => {
     >
       <v-text-field
         v-model="props.room.gps_coords.coordinates[0]"
-        label="Lat"
+        label="Lon"
       />
 
       <v-text-field
         v-model="props.room.gps_coords.coordinates[1]"
-        label="Lon"
+        label="Lat"
       />
     </div>
 

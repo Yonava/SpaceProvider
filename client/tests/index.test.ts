@@ -15,6 +15,6 @@ describe('testing location', () => {
         expect(getDistanceInMeters([0, 0], [0, 0])).toBe(0);
     });
     test('get distance in meters from two sets of more complex coordinates', () => {
-        expect(getDistanceInMeters([-72, 42], [-74, 45])).toBe(Math.round(242766.44));
+        expect(getDistanceInMeters([-72, 42], [-74, 45])).toBe(Math.round(370510.95));
     });
 });
