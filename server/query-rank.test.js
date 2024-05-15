@@ -1,5 +1,5 @@
 const getIdealRoom = require('./queryStringParser');
-const { rank: getRank, score: getScore } = require('./ernMatch');
+const { rank: getRank, score: getScore } = require('./query-rank');
 const rooms = require('./mockRoomData')
 
 describe('ernMatch', () => {

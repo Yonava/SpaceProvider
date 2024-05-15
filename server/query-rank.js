@@ -74,13 +74,15 @@ const levenshtein = (s1, s2) => {
 };
 
 /**
- * @description Returns a new array sorted by score, given by scoring function
+ * @description Returns a new array sorted by score, given by scoring function,
+ * and removing rooms with scores of 0
  * @param f Scoring function, returns number <- [0 .. 1]
  * @param arr To be sorted
  * @returns New sorted array
  */
 const scoreSort = (f, arr) => {
   return arr.map(x => [f(x), x])
+            .filter(([score, _]) => score > 0)
             .sort(([m, _], [n, __]) => n - m)
             .map(([_, x]) => x)
 }

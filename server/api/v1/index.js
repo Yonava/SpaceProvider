@@ -11,7 +11,7 @@ const { ERRORS, respondWithError } = require('../../constants');
 const Room = require('../../schemas/rooms');
 const router = express.Router();
 const parseQueryString = require('../../queryStringParser');
-const { rank } = require('../../ernMatch');
+const { rank } = require('../../query-rank');
 
 /**
  * Default pagination options for batch get requests

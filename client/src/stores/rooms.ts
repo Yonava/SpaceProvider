@@ -45,7 +45,7 @@ export const useRooms = defineStore('rooms', () => {
     loadingRooms.value = false
   }
 
-  const saveRoom = async (room: Room | PostedRoom) => {
+  const saveRoom = async (room: Room | PostedRoom, excludeImages: boolean = true) => {
 
     const currentRoomEdited = serializeRoom(room) !== serializedCurrentRoom.value
     if (!currentRoomEdited) {
@@ -57,7 +57,7 @@ export const useRooms = defineStore('rooms', () => {
 
     if ('_id' in room) {
       try {
-        return await updateRoom(room)
+        return await updateRoom(room, excludeImages)
       } catch (err) {
         console.log('failed to update')
         console.error(err)
