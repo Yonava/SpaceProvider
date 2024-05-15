@@ -4,7 +4,7 @@
 
 const NON_APLHA_NUM = /[^a-zA-Z0-9]/g;
 
-//parseBuildingRoomString unused
+//parseBuildingRoomString unused, leaving it here if needed later
 /**
  * Parses a raw query string into a building and room
  * @param {string} rawQuery - the raw query string to parse
@@ -41,17 +41,16 @@ const parseBuildingRoomString = (rawQuery) => {
 }
 
 /**
- * @description Parses a raw query string into an "ideal room" object
+ * @description Parses a raw query string into an "room query" object
  * @param {string} rawQuery - the raw query string to parse
- * @returns {Object} an object representing the ideal room
+ * @returns {Object} an object representing the room query
  * @returns {string[]} [labels] - an array of labels
- * @returns {string} [building] - the building code
- * @returns {string} [room] - the room code
- * @example parseQueryString('woo 3040') // { building: 'woo', room: '3040' }
+ * @returns {string[]} [tokens] - the building code
+ * @returns {null} null - if rawQuery is empty
 */
 const parseQueryString = (rawQuery) => {
   const query = rawQuery.trim()
-  if (query.length === 0) return {};
+  if (query.length === 0) return null;
   const tokens = query.split(' ')
 
   const labelTokenPrefix = 'label:';
@@ -63,7 +62,7 @@ const parseQueryString = (rawQuery) => {
     
   let roomQuery = {}
   roomQuery.labels = Array.from(new Set(labels));
-  if (tokenizedQuery.length > 0) roomQuery.tokens = tokenizedQuery;
+  roomQuery.tokens = tokenizedQuery;
 
   return roomQuery;
 }

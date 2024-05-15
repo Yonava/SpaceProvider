@@ -12,7 +12,7 @@ const buildingAliases = require('./building-aliases');
 const score = (roomQuery, givenRoom) => {
   let buildingScore = 1;
   let roomScore = 1;
-  if (roomQuery.tokens !== undefined) {
+  if (roomQuery.tokens.length > 0) {
     // compute sum of maximum levenshtein scores matched against aliases for givenRoom's building
     // (normalized by number of tokens to keep below 1)
     buildingScore = roomQuery.tokens.reduce((total, tok) => {
