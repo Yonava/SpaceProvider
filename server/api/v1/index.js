@@ -103,42 +103,44 @@ router.get('/', async (req, res) => {
     });
   }
 
-  const batchGetOptions = {};
+  const aggrPipeline = [];
+  const usedCoords = {};
 
   // if location parameters are provided, return rooms will be sorted by distance
   // lat cannot be provided without lon and vice versa
-  if (req.query.lat || req.query.lon) {
-    const { lat, lon } = req.query;
+  if (req.query.lon || req.query.lat) {
+    const { lon, lat } = req.query;
 
-    if (!lat || !lon) {
+    if (!lon || !lat) {
       return sendError({
         message: 'Invalid lat/lon parameters. Both must be provided',
         error: ERRORS.INVALID_GPS_COORDS
       });
     }
 
-    const latNum = parseFloat(lat);
     const lonNum = parseFloat(lon);
-
-    if (isNaN(latNum) || isNaN(lonNum)) {
+    const latNum = parseFloat(lat);
+    
+    if (isNaN(lonNum) || isNaN(latNum)) {
       return sendError({
-        message: 'Invalid lat/lon parameters. Both must be numbers',
+        message: 'Invalid lon/lat parameters. Both must be numbers',
         error: ERRORS.INVALID_GPS_COORDS
       });
     }
 
+    usedCoords.lon = lonNum;
+    usedCoords.lat = latNum;
     const geoLocationQuery = {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [lonNum, latNum]
-        }
+      $geoNear: {
+          near: { 
+            type: "Point", 
+            coordinates: [ lonNum , latNum ] 
+          },
+          distanceField: "distance"
       }
     }
 
-    console.log(geoLocationQuery)
-    // TODO fix geo query
-    // batchGetOptions['gps_coords'] = geoLocationQuery;
+    aggrPipeline.push(geoLocationQuery);
   }
 
   try {
@@ -152,32 +154,36 @@ router.get('/', async (req, res) => {
     }
 
     const getProjection = {
-      images: 0,//FIXME images: { $slice: 1 } 
+      images: 0,
     }
 
-    // get initial batch of rooms (not ranked by query, without images)
-    let rooms = await Room.find(batchGetOptions, searchProjection);
-    if (req.query.q) { // if query parameter is provided, we run a search on the database for best matches
+    aggrPipeline.push({ $project: searchProjection });
+
+    // get initial batch of rooms (ranked only by geolocation, only with fields specified by searchProjection)
+    let searchRooms = await Room.aggregate(aggrPipeline);
+    if (req.query.q) { // if query parameter is provided, we run a search on the database for best matches      
       const { q } = req.query;
       const roomQuery = parseQueryString(q);
-      rooms = rank(roomQuery, rooms);
+      if (roomQuery) {
+        searchRooms = rank(roomQuery, searchRooms);
+      }
     }
     const skip = (pageNum - 1) * limitNum;
     // get found full room documents (only first image returned)
-    rooms = await Promise.all(
-      rooms.slice(skip, skip+limitNum).map(r => Room.findById(r._id, getProjection))
+    const fullRooms = await Promise.all(
+      searchRooms.slice(skip, skip+limitNum).map(r => Room.findById(r._id, getProjection))
     );
 
     console.log('request complete')
 
-    const total_results = await Room.countDocuments(batchGetOptions);
+    const total_results = searchRooms.length;
     const total_pages = Math.ceil(total_results / limitNum);
     const last_page = pageNum >= total_pages;
 
     const page = {
       limit: limitNum,
       page: pageNum,
-      page_results: rooms.length,
+      page_results: fullRooms.length,
       total_results,
       total_pages,
       last_page
@@ -185,14 +191,14 @@ router.get('/', async (req, res) => {
 
     const options = {
       query: req.query.q,
-      lat: batchGetOptions?.gps_coords?.$near.$geometry.coordinates[1],
-      lon: batchGetOptions?.gps_coords?.$near.$geometry.coordinates[0],
+      lon: usedCoords?.lon,
+      lat: usedCoords?.lat
     }
 
     res.json({
       page,
       options,
-      rooms: rooms.map(room => ({ //FIXME
+      rooms: fullRooms.map(room => ({
         ...room._doc,
         images: []
       }))
